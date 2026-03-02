@@ -2,31 +2,31 @@
     const WEBHOOK_PROVA = 'https://n8n.segredosdodrop.com/webhook/quantic-materialize';
 
 
-    const SIZES_TOP    = ['XXP','XP','P','M','G','XG','XXG','3XG','4XG','5XG'];
-    const SIZES_BOTTOM = ['36/XXP','38/XP','40/P','42/M','44/G','46/XG','48/XXG','50/3XG','52/4XG','54/5XG'];
-    const SIZES_BOTTOM_SW = ['XXP','XP','P','M','G','XG','XXG','3XG','4XG','5XG'];
+    const SIZES_TOP = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
+    const SIZES_BOTTOM = ['36/XXP', '38/XP', '40/P', '42/M', '44/G', '46/XG', '48/XXG', '50/3XG', '52/4XG', '54/5XG'];
+    const SIZES_BOTTOM_SW = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
 
 
     const GRADE = {
-        regular:      [49,51,54,57,61,62,64,66,70,73],
-        oversized:    [58,60,62,64,66,70,73,76,79,83],
-        oversizedSS:  [58,61,63,67,70,74,78,82,87,92],
-        hoodie:       [50,53,55,58,62,65,69,74,79,83],
-        boxyHoodie:   [61,77,78,79,80,81,82,83,84,85],
-        puffer:       [53,56,59,61,70,74,78,82,86,90],
-        vest:         [52,55,57,59,63,66,70,72,76,82],
-        boxyHenley:   [54,56,58,64,66,68,70,76,78,84],
-        bottomTailoring: [36,38,40,42,44,46,48,50,52,54],
-        bottomSweat:     [36,38,40,42,44,46,48,50,52,54],
-        underwear:       [36,38,40,42,44,46,48,50,52,54],
-        quadrilTailoring: [48,50,52,56,58,60,62,64,66,68],
-        quadrilSweat:     [48,50,52,54,56,58,60,62,64,66],
-        quadrilUnderwear: [50,52,54,56,58,60,62,64,66,68],
+        regular: [49, 51, 54, 57, 61, 62, 64, 66, 70, 73],
+        oversized: [58, 60, 62, 64, 66, 70, 73, 76, 79, 83],
+        oversizedSS: [58, 61, 63, 67, 70, 74, 78, 82, 87, 92],
+        hoodie: [50, 53, 55, 58, 62, 65, 69, 74, 79, 83],
+        boxyHoodie: [61, 77, 78, 79, 80, 81, 82, 83, 84, 85],
+        puffer: [53, 56, 59, 61, 70, 74, 78, 82, 86, 90],
+        vest: [52, 55, 57, 59, 63, 66, 70, 72, 76, 82],
+        boxyHenley: [54, 56, 58, 64, 66, 68, 70, 76, 78, 84],
+        bottomTailoring: [36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
+        bottomSweat: [36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
+        underwear: [36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
+        quadrilTailoring: [48, 50, 52, 56, 58, 60, 62, 64, 66, 68],
+        quadrilSweat: [48, 50, 52, 54, 56, 58, 60, 62, 64, 66],
+        quadrilUnderwear: [50, 52, 54, 56, 58, 60, 62, 64, 66, 68],
     };
 
 
     function detectProduct(name) {
-        const n = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        const n = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         if (/tailoring/.test(n) || /\d\/\d\s*short/.test(n) || /\b(1\/5|2\/5|3\/5|4\/5)\b/.test(n)) return { category: 'bottom', fit: 'tailoring' };
         if (/underwear|cueca/.test(n)) return { category: 'bottom', fit: 'underwear' };
         if (/sweatpant|sweatshort|sweat pant|sweat short|calca|bermuda/.test(n)) return { category: 'bottom', fit: 'sweat' };
@@ -63,10 +63,10 @@
 
     function calcTop(fit) {
         const altura = parseFloat(document.getElementById('q-h-val').value);
-        const peso   = parseFloat(document.getElementById('q-w-val').value);
+        const peso = parseFloat(document.getElementById('q-w-val').value);
         if (!altura || !peso) return;
         const torax = estimarTorax(altura, peso);
-        const folga = { regular:4, oversized:8, oversizedSS:8, hoodie:6, boxyHoodie:12, puffer:10, vest:5, boxyHenley:9 };
+        const folga = { regular: 4, oversized: 8, oversizedSS: 8, hoodie: 6, boxyHoodie: 12, puffer: 10, vest: 5, boxyHenley: 9 };
         const larguraAlvo = torax / 2 + (folga[fit] || 4);
         recommendedSize = SIZES_TOP[findClosest(GRADE[fit], larguraAlvo)];
         document.getElementById('q-res-letter').innerText = recommendedSize;
@@ -100,19 +100,19 @@
 
     function lockBodyScroll() {
         scrollY = window.scrollY;
-        document.body.style.position   = 'fixed';
-        document.body.style.top        = `-${scrollY}px`;
-        document.body.style.left       = '0';
-        document.body.style.right      = '0';
-        document.body.style.overflowY  = 'scroll';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.overflowY = 'scroll';
     }
 
 
     function unlockBodyScroll() {
-        document.body.style.position  = '';
-        document.body.style.top       = '';
-        document.body.style.left      = '';
-        document.body.style.right     = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
         document.body.style.overflowY = '';
         window.scrollTo(0, scrollY);
     }
@@ -272,72 +272,43 @@
 
 
     // ─── SVG DO SELO (botão trigger) ─────────────────────────────────────────────
-    // Forma ondulada gerada por um polígono de estrela suavizado via cubic bezier.
-    // Texto segue paths circulares para o efeito de arco.
+    // Design refinado para ser idêntico à imagem: 14 ondas suaves e ícone minimalista.
     const stampSVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Provador Virtual">
   <defs>
-    <!-- Path superior para "PROVADOR" -->
-    <path id="q-arc-top"
-      d="M 17,50 A 33,33 0 1,1 83,50"
-      fill="none"/>
-    <!-- Path inferior para "VIRTUAL" -->
-    <path id="q-arc-bot"
-      d="M 19,56 A 33,33 0 0,0 81,56"
-      fill="none"/>
+    <path id="q-arc-top-ref" d="M 22,50 A 28,28 0 1,1 78,50" fill="none"/>
+    <path id="q-arc-bot-ref" d="M 24,56 A 28,28 0 0,0 76,56" fill="none"/>
   </defs>
 
-  <!-- Forma ondulada exterior (12 "pétalas") -->
+  <!-- Forma ondulada exterior (14 ondas suaves) -->
   <path d="
-    M50,4
-    C53,4 55,8 58,9
-    C61,10 65,8 67,10
-    C69,12 68,16 70,18
-    C72,20 76,20 77,23
-    C78,26 76,30 76,33
-    C76,36 79,39 78,42
-    C77,45 73,46 73,50
-    C73,54 77,55 78,58
-    C79,61 76,64 77,67
-    C78,70 81,73 80,76
-    C79,79 75,80 73,82
-    C71,84 71,88 68,89
-    C65,90 62,88 59,89
-    C56,90 54,94 50,94
-    C46,94 44,90 41,89
-    C38,88 35,90 32,89
-    C29,88 29,84 27,82
-    C25,80 21,79 20,76
-    C19,73 22,70 23,67
-    C24,64 21,61 22,58
-    C23,55 27,54 27,50
-    C27,46 23,45 22,42
-    C21,39 24,36 24,33
-    C24,30 22,26 23,23
-    C24,20 28,20 30,18
-    C32,16 31,12 33,10
-    C35,8 39,10 42,9
-    C45,8 47,4 50,4 Z
-  " fill="white" stroke="black" stroke-width="2.2"/>
+    M50,5
+    C53,5 55,8 58,9 C61,10 64,8 67,10 C70,12 70,16 73,18 C76,20 79,21 80,24
+    C81,27 79,31 80,34 C81,37 84,39 84,43 C84,47 81,50 81,54 C81,58 84,61 84,65
+    C84,69 81,72 80,75 C79,78 81,82 80,85 C79,88 76,89 73,91 C70,93 70,97 67,99
+    C64,101 61,99 58,100 C55,101 53,104 50,104 C47,104 45,101 42,100 C39,99 36,101 33,99
+    C30,97 30,93 27,91 C24,89 21,88 20,85 C19,82 21,78 20,75 C19,72 16,69 16,65
+    C16,61 19,58 19,54 C19,50 16,47 16,43 C16,39 19,37 20,34 C21,31 19,27 20,24
+    C21,21 24,20 27,18 C30,16 30,12 33,10 C36,8 39,10 42,9 C45,8 47,5 50,5 Z
+  " fill="white" stroke="black" stroke-width="1.8"/>
 
-  <!-- Círculo interno -->
-  <circle cx="50" cy="50" r="30" fill="white" stroke="black" stroke-width="2"/>
+  <!-- Círculo interno liso -->
+  <circle cx="50" cy="54.5" r="37" fill="none" stroke="black" stroke-width="1.2"/>
 
-  <!-- Ícone de pessoa (minimalista, semelhante à imagem) -->
-  <!-- Cabeça -->
-  <circle cx="50" cy="38" r="6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <!-- Corpo / ombros -->
-  <path d="M36,62 C36,52 64,52 64,62" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <!-- Ícone de pessoa (proporções da imagem) -->
+  <circle cx="50" cy="48" r="6.5" fill="none" stroke="black" stroke-width="1.8"/>
+  <path d="M38,62 C38,54 62,54 62,62" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
 
-  <!-- Texto "PROVADOR" em arco superior -->
-  <text font-family="'Inter','Arial',sans-serif" font-size="7.8" font-weight="600" fill="black" letter-spacing="1.5">
-    <textPath href="#q-arc-top" startOffset="50%" text-anchor="middle">PROVADOR</textPath>
+  <!-- Texto PROVADOR -->
+  <text font-family="'Inter', sans-serif" font-size="9" font-weight="500" fill="black" style="letter-spacing: 2.5px;">
+    <textPath href="#q-arc-top-ref" startOffset="50%" text-anchor="middle">PROVADOR</textPath>
   </text>
 
-  <!-- Texto "VIRTUAL" em arco inferior -->
-  <text font-family="'Inter','Arial',sans-serif" font-size="7.8" font-weight="600" fill="black" letter-spacing="1.5">
-    <textPath href="#q-arc-bot" startOffset="50%" text-anchor="middle">VIRTUAL</textPath>
+  <!-- Texto VIRTUAL -->
+  <text font-family="'Inter', sans-serif" font-size="9" font-weight="500" fill="black" style="letter-spacing: 2.5px;">
+    <textPath href="#q-arc-bot-ref" startOffset="50%" text-anchor="middle">VIRTUAL</textPath>
   </text>
 </svg>`;
+
 
 
     // ─── HTML ─────────────────────────────────────────────────────────────────────
@@ -497,7 +468,7 @@
         openBtn.innerHTML = stampSVG;
 
 
-        const imgContainers = ['.product__media-wrapper','.product-gallery__media','.product__media','.product-image-main','.product-media-container','[data-media-id]','.product__media-item','.product-gallery','.product-single__media','.media-gallery'];
+        const imgContainers = ['.product__media-wrapper', '.product-gallery__media', '.product__media', '.product-image-main', '.product-media-container', '[data-media-id]', '.product__media-item', '.product-gallery', '.product-single__media', '.media-gallery'];
         let placed = false;
         for (const sel of imgContainers) {
             const el = document.querySelector(sel);
@@ -513,14 +484,14 @@
         }
 
 
-        const modal         = document.getElementById('q-modal-ia');
-        const genBtn        = document.getElementById('q-btn-generate');
-        const closeBtn      = document.getElementById('q-close-btn');
-        const backBtn       = document.getElementById('q-btn-back');
-        const retryBtn      = document.getElementById('q-retry-btn');
-        const realInput     = document.getElementById('q-real-input');
+        const modal = document.getElementById('q-modal-ia');
+        const genBtn = document.getElementById('q-btn-generate');
+        const closeBtn = document.getElementById('q-close-btn');
+        const backBtn = document.getElementById('q-btn-back');
+        const retryBtn = document.getElementById('q-retry-btn');
+        const realInput = document.getElementById('q-real-input');
         const triggerUpload = document.getElementById('q-trigger-upload');
-        const phoneInput    = document.getElementById('q-phone');
+        const phoneInput = document.getElementById('q-phone');
 
 
         let userPhoto = null;
@@ -540,7 +511,7 @@
 
         function applyProduct(product) {
             currentProduct = product;
-            document.getElementById('q-fields-top').style.display    = product.category === 'top'    ? 'block' : 'none';
+            document.getElementById('q-fields-top').style.display = product.category === 'top' ? 'block' : 'none';
             document.getElementById('q-fields-bottom').style.display = product.category === 'bottom' ? 'block' : 'none';
         }
 
@@ -553,7 +524,7 @@
 
 
         closeBtn.onclick = () => closeModal();
-        backBtn.onclick  = () => closeModal();
+        backBtn.onclick = () => closeModal();
 
 
         modal.addEventListener('click', (e) => {
@@ -574,15 +545,15 @@
         triggerUpload.onclick = () => realInput.click();
 
 
-        phoneInput.addEventListener('input', function(e) {
-            let x = e.target.value.replace(/\D/g,'').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-            e.target.value = !x[2] ? x[1] : '('+x[1]+') '+x[2]+(x[3] ? '-'+x[3] : '');
+        phoneInput.addEventListener('input', function (e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
             checkFields();
         });
 
 
         function checkFields() {
-            const nums = phoneInput.value.replace(/\D/g,'');
+            const nums = phoneInput.value.replace(/\D/g, '');
             const phoneOk = nums.length >= 10 && nums.length <= 11;
             document.getElementById('q-phone-error').style.display = (phoneInput.value.length > 0 && !phoneOk) ? 'block' : 'none';
             phoneInput.style.borderColor = (phoneInput.value.length > 0 && !phoneOk) ? '#ef4444' : 'var(--q-border)';
@@ -593,7 +564,7 @@
         }
 
 
-        ['q-h-val','q-w-val','q-cin-val','q-quad-val'].forEach(id => {
+        ['q-h-val', 'q-w-val', 'q-cin-val', 'q-quad-val'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', checkFields);
         });
@@ -615,8 +586,8 @@
 
         genBtn.onclick = async () => {
             const prodImgTag = document.querySelector('.product__media img,img.product-featured-media,.product-single__photo');
-            const prodImg    = prodImgTag ? prodImgTag.src : (document.querySelector('meta[property="og:image"]')?.content || '');
-            const prodName   = document.querySelector('h1.product__title,.product-single__title,h1')?.innerText || document.title;
+            const prodImg = prodImgTag ? prodImgTag.src : (document.querySelector('meta[property="og:image"]')?.content || '');
+            const prodName = document.querySelector('h1.product__title,.product-single__title,h1')?.innerText || document.title;
 
 
             document.getElementById('q-step-upload').style.display = 'none';
@@ -626,11 +597,11 @@
             try {
                 const fd = new FormData();
                 fd.append('person_image', userPhoto);
-                fd.append('whatsapp', '55' + phoneInput.value.replace(/\D/g,''));
+                fd.append('whatsapp', '55' + phoneInput.value.replace(/\D/g, ''));
                 fd.append('phone_raw', phoneInput.value);
                 fd.append('product_name', prodName);
                 fd.append('product_type', currentProduct.category);
-                fd.append('product_fit',  currentProduct.fit);
+                fd.append('product_fit', currentProduct.fit);
 
 
                 if (currentProduct.category === 'top') {
@@ -643,7 +614,7 @@
 
 
                 if (prodImg) {
-                    try { const b = await fetch(prodImg).then(r => r.blob()); fd.append('product_image', b, 'p.png'); } catch (_) {}
+                    try { const b = await fetch(prodImg).then(r => r.blob()); fd.append('product_image', b, 'p.png'); } catch (_) { }
                 }
 
 
@@ -662,7 +633,7 @@
                     const cVal = document.getElementById('q-cin-val').value;
                     const resH = document.getElementById('q-res-height');
                     const resW = document.getElementById('q-res-weight');
-                    if (resH) resH.textContent = hVal ? (parseFloat(hVal)/100).toFixed(2) : '—';
+                    if (resH) resH.textContent = hVal ? (parseFloat(hVal) / 100).toFixed(2) : '—';
                     if (resW) resW.textContent = wVal || (cVal ? cVal + ' cm' : '—');
 
 
@@ -675,7 +646,7 @@
 
 
                 } else { throw new Error(); }
-            } catch(e) {
+            } catch (e) {
                 alert('Ocorreu um erro ao processar sua imagem. Tente novamente.');
                 location.reload();
             }
@@ -707,7 +678,7 @@
                 if (el) {
                     el.click();
                     el.dispatchEvent(new Event('change', { bubbles: true }));
-                    el.dispatchEvent(new Event('input',  { bubbles: true }));
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
                     selected = true;
                     break;
                 }
@@ -719,7 +690,7 @@
                 for (const sel of selects) {
                     const opt = [...sel.options].find(o =>
                         o.value.trim().toUpperCase() === size.toUpperCase() ||
-                        o.text.trim().toUpperCase()  === size.toUpperCase()
+                        o.text.trim().toUpperCase() === size.toUpperCase()
                     );
                     if (opt) {
                         sel.value = opt.value;
