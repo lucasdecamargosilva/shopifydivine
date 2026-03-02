@@ -131,15 +131,15 @@
         /* ── BOTÃO SELO ─────────────────────────────────────────────────────────── */
         .q-btn-trigger-ia {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             z-index: 100;
             background: none;
             border: none;
             padding: 0;
             cursor: pointer;
-            width: 88px;
-            height: 88px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -438,7 +438,7 @@
             }
         }
         if (!placed) {
-            openBtn.style.cssText = 'position:fixed;bottom:30px;right:20px;top:auto;width:88px;height:88px;';
+            openBtn.style.cssText = 'position:fixed;bottom:30px;right:20px;top:auto;width:60px;height:60px;';
             document.body.appendChild(openBtn);
         }
 
