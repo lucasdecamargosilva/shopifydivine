@@ -131,9 +131,8 @@
         /* ── BOTÃO SELO ─────────────────────────────────────────────────────────── */
         .q-btn-trigger-ia {
             position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 20px;
+            right: 20px;
             z-index: 100;
             background: none;
             border: none;
@@ -148,11 +147,11 @@
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
         }
         .q-btn-trigger-ia:hover {
-            transform: translateX(-50%) scale(1.08) rotate(8deg);
+            transform: scale(1.08) rotate(8deg);
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.28));
         }
         .q-btn-trigger-ia:active {
-            transform: translateX(-50%) scale(0.96);
+            transform: scale(0.96);
         }
         .q-btn-trigger-ia svg {
             width: 100%;
@@ -479,7 +478,7 @@
             }
         }
         if (!placed) {
-            openBtn.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);top:auto;width:88px;height:88px;';
+            openBtn.style.cssText = 'position:fixed;bottom:30px;right:20px;top:auto;width:88px;height:88px;';
             document.body.appendChild(openBtn);
         }
 
