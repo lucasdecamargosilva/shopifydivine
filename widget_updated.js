@@ -265,43 +265,8 @@
     `;
 
 
-    // ─── SVG DO SELO (botão trigger) ─────────────────────────────────────────────
-    // Design refinado para ser idêntico à imagem: 14 ondas suaves e ícone minimalista.
-    const stampSVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Provador Virtual">
-  <defs>
-    <path id="q-arc-top-ref" d="M 22,50 A 28,28 0 1,1 78,50" fill="none"/>
-    <path id="q-arc-bot-ref" d="M 24,56 A 28,28 0 0,0 76,56" fill="none"/>
-  </defs>
-
-  <!-- Forma ondulada exterior (14 ondas suaves) -->
-  <path d="
-    M50,5
-    C53,5 55,8 58,9 C61,10 64,8 67,10 C70,12 70,16 73,18 C76,20 79,21 80,24
-    C81,27 79,31 80,34 C81,37 84,39 84,43 C84,47 81,50 81,54 C81,58 84,61 84,65
-    C84,69 81,72 80,75 C79,78 81,82 80,85 C79,88 76,89 73,91 C70,93 70,97 67,99
-    C64,101 61,99 58,100 C55,101 53,104 50,104 C47,104 45,101 42,100 C39,99 36,101 33,99
-    C30,97 30,93 27,91 C24,89 21,88 20,85 C19,82 21,78 20,75 C19,72 16,69 16,65
-    C16,61 19,58 19,54 C19,50 16,47 16,43 C16,39 19,37 20,34 C21,31 19,27 20,24
-    C21,21 24,20 27,18 C30,16 30,12 33,10 C36,8 39,10 42,9 C45,8 47,5 50,5 Z
-  " fill="white" stroke="black" stroke-width="1.8"/>
-
-  <!-- Círculo interno liso -->
-  <circle cx="50" cy="54.5" r="37" fill="none" stroke="black" stroke-width="1.2"/>
-
-  <!-- Ícone de pessoa (proporções da imagem) -->
-  <circle cx="50" cy="48" r="6.5" fill="none" stroke="black" stroke-width="1.8"/>
-  <path d="M38,62 C38,54 62,54 62,62" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
-
-  <!-- Texto PROVADOR -->
-  <text font-family="'Inter', sans-serif" font-size="9" font-weight="500" fill="black" style="letter-spacing: 2.5px;">
-    <textPath href="#q-arc-top-ref" startOffset="50%" text-anchor="middle">PROVADOR</textPath>
-  </text>
-
-  <!-- Texto VIRTUAL -->
-  <text font-family="'Inter', sans-serif" font-size="9" font-weight="500" fill="black" style="letter-spacing: 2.5px;">
-    <textPath href="#q-arc-bot-ref" startOffset="50%" text-anchor="middle">VIRTUAL</textPath>
-  </text>
-</svg>`;
+    // ─── IMAGEM DO BOTÃO (trigger) ─────────────────────────────────────────────
+    const stampImageHTML = `<img src="https://cdn.shopify.com/s/files/1/0636/6334/1746/files/logo_provador.png?v=1772494793" alt="Provador Virtual" style="width:100%;height:100%;object-fit:contain;">`;
 
 
 
@@ -454,12 +419,12 @@
         document.body.appendChild(modalContainer);
 
 
-        // ── Botão selo SVG ──
+        // ── Botão imagem PNG ──
         const openBtn = document.createElement('button');
         openBtn.className = 'q-btn-trigger-ia';
         openBtn.id = 'q-open-ia';
         openBtn.setAttribute('aria-label', 'Abrir Provador Virtual');
-        openBtn.innerHTML = stampSVG;
+        openBtn.innerHTML = stampImageHTML;
 
 
         const imgContainers = ['.product__media-wrapper', '.product-gallery__media', '.product__media', '.product-image-main', '.product-media-container', '[data-media-id]', '.product__media-item', '.product-gallery', '.product-single__media', '.media-gallery'];
