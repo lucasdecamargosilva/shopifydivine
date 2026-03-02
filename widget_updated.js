@@ -143,15 +143,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
         }
         .q-btn-trigger-ia:hover {
-            transform: scale(1.08) rotate(8deg);
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.28));
-        }
-        .q-btn-trigger-ia:active {
-            transform: scale(0.96);
         }
         .q-btn-trigger-ia svg {
             width: 100%;
