@@ -1,7 +1,11 @@
 (function () {
+    // ===============================================
+    // 0. CHUMBAR A API KEY AQUI DIRETO NO CÓDIGO
+    // ===============================================
+    const apiKey = "pl_live_COLOQUE_A_CHAVE_AQUI";
+    window.PROVOU_LEVOU_API_KEY = apiKey;
+
     const WEBHOOK_PROVA = 'https://n8n.segredosdodrop.com/webhook/quantic-materialize';
-
-
     const SIZES_TOP = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
     const SIZES_BOTTOM = ['36/XXP', '38/XP', '40/P', '42/M', '44/G', '46/XG', '48/XXG', '50/3XG', '52/4XG', '54/5XG'];
     const SIZES_BOTTOM_SW = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
@@ -544,6 +548,13 @@
 
 
         genBtn.onclick = async () => {
+            // 🚨 VALIDAÇÃO BÁSICA NO FRONT 🚨
+            const keyToUse = window.PROVOU_LEVOU_API_KEY;
+            if (!keyToUse || keyToUse.includes("COLOQUE_A_CHAVE_AQUI")) {
+                alert("Erro: API Key não configurada neste script.");
+                return;
+            }
+
             const prodImgTag = document.querySelector('.product__media img,img.product-featured-media,.product-single__photo');
             const prodImg = prodImgTag ? prodImgTag.src : (document.querySelector('meta[property="og:image"]')?.content || '');
             const prodName = document.querySelector('h1.product__title,.product-single__title,h1')?.innerText || document.title;
@@ -561,6 +572,9 @@
                 fd.append('product_name', prodName);
                 fd.append('product_type', currentProduct.category);
                 fd.append('product_fit', currentProduct.fit);
+
+                // 👉 INJETA A CHAVE NO FORM DATA PRO N8N LER
+                fd.append('api_key', keyToUse);
 
 
                 if (currentProduct.category === 'top') {
@@ -604,10 +618,15 @@
                     document.getElementById('q-step-result').style.display = 'flex';
 
 
+                } else if (res.status === 401 || res.status === 403) {
+                    document.getElementById('q-loading-box').style.display = 'none';
+                    document.getElementById('q-step-upload').style.display = 'block';
+                    alert("Provas virtuais indisponíveis nesta loja no momento. (Assinatura Inativa/Chave Inválida)");
                 } else { throw new Error(); }
             } catch (e) {
-                alert('Ocorreu um erro ao processar sua imagem. Tente novamente.');
-                location.reload();
+                document.getElementById('q-loading-box').style.display = 'none';
+                document.getElementById('q-step-upload').style.display = 'block';
+                alert('Ocorreu um erro ao processar sua imagem (ou chave/servidor indisponíveis). Tente novamente.');
             }
         };
 
