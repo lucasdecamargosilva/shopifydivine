@@ -386,10 +386,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="q-powered-footer">
+                <a href="https://provoulevou.com.br" target="_blank" class="q-powered-footer" style="text-decoration:none;">
                     <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--q-text-light);">Powered by</span>
-                    <img src="https://i.ibb.co/jP66Xwqt/logo-provou-levou-sem-fundo.png" class="q-quantic-logo">
-                </div>
+                    <img src="https://provoulevou.com.br/assets/provoulevou-logo.png" class="q-quantic-logo">
+                </a>
             </div>
         </div>
     `;
