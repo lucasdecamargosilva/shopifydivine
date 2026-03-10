@@ -767,10 +767,8 @@
 
 
     // ─── EXECUTA APENAS EM PÁGINAS DE PRODUTO ────────────────────────────────────
-    // ─── EXECUTA EM PÁGINAS DE PRODUTO OU NO PREVIEW ─────────────────────────────
-    const isProductPage = window.location.pathname.includes('/products/') ||
-        window.location.pathname.includes('preview.html') ||
-        window.location.protocol === 'file:';
+    const isProductPage = window.location.pathname.includes('/products/');
+
 
     if (isProductPage) {
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
