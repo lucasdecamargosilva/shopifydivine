@@ -766,8 +766,10 @@
     }
 
 
-    // ─── EXECUTA APENAS EM PÁGINAS DE PRODUTO ────────────────────────────────────
-    const isProductPage = window.location.pathname.includes('/products/');
+    // ─── EXECUTA EM PÁGINAS DE PRODUTO OU NO PREVIEW ─────────────────────────────
+    const isProductPage = window.location.pathname.includes('/products/') ||
+        window.location.pathname.includes('preview.html') ||
+        window.location.protocol === 'file:';
 
 
     if (isProductPage) {
