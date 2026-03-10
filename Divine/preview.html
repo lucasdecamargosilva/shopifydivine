@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview DIVINÉ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .product-container {
+            background-color: white;
+            padding: 30px;
+            border: 1px solid #ddd;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            gap: 30px;
+            position: relative;
+        }
+
+        .product-image-container {
+            flex: 1;
+            background-color: #eee;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .product-image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1.product__title {
+            font-size: 28px;
+            margin: 0 0 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        button.add-to-cart {
+            padding: 15px;
+            background: #000;
+            color: #fff;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="product-container">
+        <div class="product-image-container product__media-wrapper">
+            <img src="https://via.placeholder.com/600x800/000000/ffffff?text=DIVINE+PRODUCT" alt="Produto Divine">
+        </div>
+
+        <div class="product-info">
+            <h1 class="product__title">Camiseta Boxy Teste</h1>
+            <p class="price">R$ 189,00</p>
+
+            <div style="margin-bottom: 20px;">
+                <label>Tamanho:</label>
+                <select name="size">
+                    <option value="P">P</option>
+                    <option value="M">M</option>
+                    <option value="G">G</option>
+                    <option value="XG">XG</option>
+                </select>
+            </div>
+
+            <button class="add-to-cart">Adicionar ao Carrinho</button>
+        </div>
+    </div>
+
+    <!-- Script do Provador -->
+    <script src="divine_provador-v3.js"></script>
+
+</body>
+
+</html>

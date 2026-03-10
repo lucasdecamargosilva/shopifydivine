@@ -346,6 +346,24 @@
                         <button class="q-btn-black" id="q-btn-generate" disabled>Ver no meu corpo</button>
                     </div>
 
+                    <!-- NOVO: Passo de Confirmação -->
+                    <div id="q-step-confirm" style="display:none;text-align:center;">
+                        <h2 style="margin:0 0 10px 0;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#b45309;">Sua foto segue os requisitos abaixo?</h2>
+                        <div id="q-confirm-preview" style="width:160px;height:220px;margin:0 auto 20px;border:1px solid var(--q-border);overflow:hidden;">
+                            <img id="q-confirm-img" style="width:100%;height:100%;object-fit:cover;">
+                        </div>
+                        <div class="q-tips-grid" style="margin-bottom:25px;">
+                            <div class="q-tip-item"><i class="ph ph-t-shirt"></i><span>Com Roupa</span></div>
+                            <div class="q-tip-item"><i class="ph ph-person"></i><span>Corpo Inteiro</span></div>
+                            <div class="q-tip-item"><i class="ph ph-sun"></i><span>Boa Luz</span></div>
+                        </div>
+                        <div style="margin-bottom:30px;padding:12px;background:#fff8e1;border-bottom:2px solid #f59e0b;font-size:10px;font-weight:600;color:#92400e;line-height:1.5;">
+                            Se o produto for de costas, tire a foto de costas. Se for frente, tire de frente.
+                        </div>
+                        <button class="q-btn-black" id="q-btn-confirm-yes" style="margin-top:0;background:#059669;border-color:#059669;">SIM, GERAR FOTO</button>
+                        <button class="q-btn-outline" id="q-btn-confirm-no" style="margin-top:10px;border-color:#ef4444;color:#ef4444;">NÃO, TROCAR FOTO</button>
+                    </div>
+
 
                     <div style="display:none;padding:60px 0;text-align:center;" id="q-loading-box">
                         <div style="font-weight:600;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;animation:q-pulse-text 1.5s infinite ease-in-out;">Gerando Prova Virtual...</div>
@@ -462,6 +480,12 @@
 
         const modal = document.getElementById('q-modal-ia');
         const genBtn = document.getElementById('q-btn-generate');
+        const confirmStep = document.getElementById('q-step-confirm');
+        const confirmBtnYes = document.getElementById('q-btn-confirm-yes');
+        const confirmBtnNo = document.getElementById('q-btn-confirm-no');
+        const confirmImg = document.getElementById('q-confirm-img');
+        const uploadStep = document.getElementById('q-step-upload');
+
         const closeBtn = document.getElementById('q-close-btn');
         const backBtn = document.getElementById('q-btn-back');
         const retryBtn = document.getElementById('q-retry-btn');
@@ -560,21 +584,37 @@
         };
 
 
-        genBtn.onclick = async () => {
+        genBtn.onclick = () => {
+            const rd = new FileReader();
+            rd.onload = ev => {
+                confirmImg.src = ev.target.result;
+                uploadStep.style.display = 'none';
+                confirmStep.style.display = 'block';
+            };
+            rd.readAsDataURL(userPhoto);
+        };
+
+        confirmBtnNo.onclick = () => {
+            confirmStep.style.display = 'none';
+            uploadStep.style.display = 'block';
+        };
+
+        confirmBtnYes.onclick = async () => {
+            confirmStep.style.display = 'none';
+            document.getElementById('q-loading-box').style.display = 'block';
+
             // 🚨 VALIDAÇÃO BÁSICA NO FRONT 🚨
             const keyToUse = window.PROVOU_LEVOU_API_KEY;
             if (!keyToUse || keyToUse.includes("COLOQUE_A_CHAVE_AQUI")) {
                 alert("Erro: API Key não configurada neste script.");
+                document.getElementById('q-loading-box').style.display = 'none';
+                uploadStep.style.display = 'block';
                 return;
             }
 
             const prodImgTag = document.querySelector('.product__media img,img.product-featured-media,.product-single__photo');
             const prodImg = prodImgTag ? prodImgTag.src : (document.querySelector('meta[property="og:image"]')?.content || '');
             const prodName = document.querySelector('h1.product__title,.product-single__title,h1')?.innerText || document.title;
-
-
-            document.getElementById('q-step-upload').style.display = 'none';
-            document.getElementById('q-loading-box').style.display = 'block';
 
 
             try {
@@ -633,12 +673,12 @@
 
                 } else if (res.status === 401 || res.status === 403) {
                     document.getElementById('q-loading-box').style.display = 'none';
-                    document.getElementById('q-step-upload').style.display = 'block';
+                    uploadStep.style.display = 'block';
                     alert("Provas virtuais indisponíveis nesta loja no momento. (Assinatura Inativa/Chave Inválida)");
                 } else { throw new Error(); }
             } catch (e) {
                 document.getElementById('q-loading-box').style.display = 'none';
-                document.getElementById('q-step-upload').style.display = 'block';
+                uploadStep.style.display = 'block';
                 alert('Ocorreu um erro ao processar sua imagem (ou chave/servidor indisponíveis). Tente novamente.');
             }
         };
