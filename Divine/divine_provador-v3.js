@@ -133,6 +133,15 @@
         }
 
         /* ── BOTÃO SELO ─────────────────────────────────────────────────────────── */
+        @keyframes q-shake {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(-10deg); }
+            20% { transform: rotate(10deg); }
+            30% { transform: rotate(-10deg); }
+            40% { transform: rotate(10deg); }
+            50% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
         .q-btn-trigger-ia {
             position: absolute;
             top: 15px;
@@ -148,9 +157,13 @@
             align-items: center;
             justify-content: center;
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
+            transition: transform 0.2s ease, filter 0.2s ease;
+            animation: q-shake 3s infinite;
         }
         .q-btn-trigger-ia:hover {
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.28));
+            animation-play-state: paused;
+            transform: scale(1.1) !important;
         }
         .q-btn-trigger-ia svg {
             width: 100%;
