@@ -338,11 +338,6 @@
                             <div class="q-tip-item"><i class="ph ph-sun"></i><span>Boa Luz</span></div>
                         </div>
 
-                        <div style="margin-bottom:25px;padding:15px;background:#fff8e1;border:2px solid #f59e0b;border-radius:4px;">
-                            <p style="margin:0;font-size:11px;font-weight:700;line-height:1.5;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;">
-                                ⚠️ ATENÇÃO: Se o produto for de costas, envie foto de costas. Se for de frente, envie de frente.
-                            </p>
-                        </div>
 
                         <button class="q-btn-black" id="q-popup-confirm-btn" style="margin-top:0;background:#000;border-color:#000;padding:18px;font-weight:700;">SIM, GERAR FOTO</button>
                         <button class="q-btn-outline" id="q-popup-cancel-btn" style="margin-top:10px;border-color:#ef4444;color:#ef4444;padding:15px;font-size:10px;">NÃO, QUERO TROCAR</button>
