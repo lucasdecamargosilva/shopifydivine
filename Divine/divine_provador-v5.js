@@ -200,6 +200,30 @@
         
         #q-step-confirm { animation: q-fade-in 0.4s ease-out; }
 
+        .q-popup-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(2px);
+        }
+        .q-popup-box {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--q-border);
+            max-width: 340px;
+            animation: q-pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes q-pop-in {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         .q-content-scroll::-webkit-scrollbar { width: 4px; }
         .q-content-scroll::-webkit-scrollbar-thumb { background: #e5e5e5; }
 
@@ -297,6 +321,20 @@
         <div id="q-modal-ia">
             <div class="q-card-ia">
                 <button type="button" class="q-close-ia" id="q-close-btn">&times;</button>
+                
+                <!-- POPUP DE AVISO -->
+                <div id="q-popup-notice" class="q-popup-overlay">
+                    <div class="q-popup-box">
+                        <i class="ph ph-warning-circle" style="font-size:40px;color:#f59e0b;margin-bottom:15px;display:block;"></i>
+                        <h3 style="margin:0 0 10px;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#92400e;">Atenção</h3>
+                        <p style="margin:0 0 25px;font-size:12px;font-weight:600;line-height:1.6;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;">
+                            Se o produto for de costas, envie foto de costas.<br>
+                            Se for de frente, envie de frente.
+                        </p>
+                        <button class="q-btn-black" id="q-popup-confirm-btn" style="margin-top:0;background:#000;border-color:#000;padding:15px;">ENTENDI</button>
+                    </div>
+                </div>
+
                 <div class="q-content-scroll">
                     <div id="q-header-provador">
                         <h1 style="margin:0 0 10px 0;font-size:20px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Provador Virtual</h1>
@@ -359,9 +397,6 @@
                             <div class="q-tip-item"><i class="ph ph-t-shirt"></i><span>Com Roupa</span></div>
                             <div class="q-tip-item"><i class="ph ph-person"></i><span>Corpo Inteiro</span></div>
                             <div class="q-tip-item"><i class="ph ph-sun"></i><span>Boa Luz</span></div>
-                        </div>
-                        <div style="margin-bottom:30px;padding:12px;background:#fff8e1;border:2px solid #f59e0b;font-size:10px;font-weight:700;color:#92400e;line-height:1.5;text-transform:uppercase;letter-spacing:1px;">
-                            ⚠️ ATENÇÃO: Se o produto for de costas, envie foto de costas. Se for de frente, envie de frente.
                         </div>
                         <button class="q-btn-black" id="q-btn-confirm-yes" style="margin-top:0;background:#059669;border-color:#059669;">SIM, ESTÁ TUDO CERTO</button>
                         <button class="q-btn-outline" id="q-btn-confirm-no" style="margin-top:10px;border-color:#ef4444;color:#ef4444;">NÃO, QUERO TROCAR</button>
@@ -588,6 +623,11 @@
 
 
         genBtn.onclick = () => {
+            document.getElementById('q-popup-notice').style.display = 'flex';
+        };
+
+        document.getElementById('q-popup-confirm-btn').onclick = () => {
+            document.getElementById('q-popup-notice').style.display = 'none';
             const rd = new FileReader();
             rd.onload = ev => {
                 confirmImg.src = ev.target.result;
