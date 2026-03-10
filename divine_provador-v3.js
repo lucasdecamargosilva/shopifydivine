@@ -297,7 +297,7 @@
                     <div id="q-step-upload">
                         <div class="q-lead-form">
                             <div class="q-group">
-                                <label>Seu WhatsApp</label>
+                                <label>Seu Celular</label>
                                 <input type="tel" id="q-phone" class="q-input" placeholder="(11) 99999-9999" maxlength="15">
                                 <div id="q-phone-error" class="q-status-msg">Insira um número válido</div>
                             </div>
