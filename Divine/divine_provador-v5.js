@@ -133,14 +133,14 @@
         }
 
         /* ── BOTÃO SELO COM EFEITO SHAKE E PULSE ────────────────────────────────── */
-        @keyframes q-shake-pulse {
-            0% { transform: scale(1) rotate(0deg); }
-            5% { transform: scale(1.1) rotate(-5deg); }
-            10% { transform: scale(1.1) rotate(5deg); }
-            15% { transform: scale(1.1) rotate(-5deg); }
-            20% { transform: scale(1.1) rotate(5deg); }
-            25% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1) rotate(0deg); }
+        @keyframes q-shake {
+            0% { transform: rotate(0deg); }
+            5% { transform: rotate(-5deg); }
+            10% { transform: rotate(5deg); }
+            15% { transform: rotate(-5deg); }
+            20% { transform: rotate(5deg); }
+            25% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
         }
         .q-btn-trigger-ia {
             position: absolute;
@@ -158,12 +158,11 @@
             justify-content: center;
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
             transition: transform 0.2s ease, filter 0.2s ease;
-            animation: q-shake-pulse 4s infinite;
+            animation: q-shake 4s infinite;
         }
         .q-btn-trigger-ia:hover {
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.28));
             animation-play-state: paused;
-            transform: scale(1.15) !important;
         }
         .q-btn-trigger-ia img {
             width: 100%;
