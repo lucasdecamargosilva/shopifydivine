@@ -322,16 +322,25 @@
             <div class="q-card-ia">
                 <button type="button" class="q-close-ia" id="q-close-btn">&times;</button>
                 
-                <!-- POPUP DE AVISO -->
+                <!-- POPUP DE CONFIRMAÇÃO E AVISO -->
                 <div id="q-popup-notice" class="q-popup-overlay">
-                    <div class="q-popup-box">
-                        <i class="ph ph-warning-circle" style="font-size:40px;color:#f59e0b;margin-bottom:15px;display:block;"></i>
-                        <h3 style="margin:0 0 10px;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#92400e;">Atenção</h3>
-                        <p style="margin:0 0 25px;font-size:12px;font-weight:600;line-height:1.6;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;">
-                            Se o produto for de costas, envie foto de costas.<br>
-                            Se for de frente, envie de frente.
-                        </p>
-                        <button class="q-btn-black" id="q-popup-confirm-btn" style="margin-top:0;background:#000;border-color:#000;padding:15px;">ENTENDI</button>
+                    <div class="q-popup-box" style="max-width: 380px;">
+                        <h3 style="margin:0 0 15px;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#000;">Sua foto segue estes requisitos?</h3>
+                        
+                        <div class="q-tips-grid" style="margin: 0 0 20px; border: none; padding: 0;">
+                            <div class="q-tip-item"><i class="ph ph-t-shirt"></i><span>Com Roupa</span></div>
+                            <div class="q-tip-item"><i class="ph ph-person"></i><span>Corpo Inteiro</span></div>
+                            <div class="q-tip-item"><i class="ph ph-sun"></i><span>Boa Luz</span></div>
+                        </div>
+
+                        <div style="margin-bottom:25px;padding:15px;background:#fff8e1;border:2px solid #f59e0b;border-radius:4px;">
+                            <p style="margin:0;font-size:11px;font-weight:700;line-height:1.5;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;">
+                                ⚠️ ATENÇÃO: Se o produto for de costas, envie foto de costas. Se for de frente, envie de frente.
+                            </p>
+                        </div>
+
+                        <button class="q-btn-black" id="q-popup-confirm-btn" style="margin-top:0;background:#000;border-color:#000;padding:18px;font-weight:700;">SIM, GERAR FOTO</button>
+                        <button class="q-btn-outline" id="q-popup-cancel-btn" style="margin-top:10px;border-color:#ef4444;color:#ef4444;padding:15px;font-size:10px;">NÃO, QUERO TROCAR</button>
                     </div>
                 </div>
 
@@ -385,21 +394,6 @@
                             </div>
                         </div>
                         <button class="q-btn-black" id="q-btn-generate" disabled>Ver no meu corpo</button>
-                    </div>
-
-                    <!-- PASSO DE CONFIRMAÇÃO COM AVISO -->
-                    <div id="q-step-confirm" style="display:none;text-align:center;">
-                        <h2 style="margin:0 0 10px 0;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#b45309;">Sua foto segue os requisitos abaixo?</h2>
-                        <div id="q-confirm-preview" style="width:160px;height:220px;margin:0 auto 20px;border:1px solid var(--q-border);overflow:hidden;">
-                            <img id="q-confirm-img" style="width:100%;height:100%;object-fit:cover;">
-                        </div>
-                        <div class="q-tips-grid" style="margin-bottom:25px;">
-                            <div class="q-tip-item"><i class="ph ph-t-shirt"></i><span>Com Roupa</span></div>
-                            <div class="q-tip-item"><i class="ph ph-person"></i><span>Corpo Inteiro</span></div>
-                            <div class="q-tip-item"><i class="ph ph-sun"></i><span>Boa Luz</span></div>
-                        </div>
-                        <button class="q-btn-black" id="q-btn-confirm-yes" style="margin-top:0;background:#059669;border-color:#059669;">SIM, ESTÁ TUDO CERTO</button>
-                        <button class="q-btn-outline" id="q-btn-confirm-no" style="margin-top:10px;border-color:#ef4444;color:#ef4444;">NÃO, QUERO TROCAR</button>
                     </div>
 
 
@@ -518,10 +512,9 @@
 
         const modal = document.getElementById('q-modal-ia');
         const genBtn = document.getElementById('q-btn-generate');
-        const confirmStep = document.getElementById('q-step-confirm');
-        const confirmBtnYes = document.getElementById('q-btn-confirm-yes');
-        const confirmBtnNo = document.getElementById('q-btn-confirm-no');
-        const confirmImg = document.getElementById('q-confirm-img');
+        const popupNotice = document.getElementById('q-popup-notice');
+        const popupConfirmBtn = document.getElementById('q-popup-confirm-btn');
+        const popupCancelBtn = document.getElementById('q-popup-cancel-btn');
         const uploadStep = document.getElementById('q-step-upload');
 
         const closeBtn = document.getElementById('q-close-btn');
@@ -623,27 +616,16 @@
 
 
         genBtn.onclick = () => {
-            document.getElementById('q-popup-notice').style.display = 'flex';
+            popupNotice.style.display = 'flex';
         };
 
-        document.getElementById('q-popup-confirm-btn').onclick = () => {
-            document.getElementById('q-popup-notice').style.display = 'none';
-            const rd = new FileReader();
-            rd.onload = ev => {
-                confirmImg.src = ev.target.result;
-                uploadStep.style.display = 'none';
-                confirmStep.style.display = 'block';
-            };
-            rd.readAsDataURL(userPhoto);
+        popupCancelBtn.onclick = () => {
+            popupNotice.style.display = 'none';
         };
 
-        confirmBtnNo.onclick = () => {
-            confirmStep.style.display = 'none';
-            uploadStep.style.display = 'block';
-        };
-
-        confirmBtnYes.onclick = async () => {
-            confirmStep.style.display = 'none';
+        popupConfirmBtn.onclick = async () => {
+            popupNotice.style.display = 'none';
+            uploadStep.style.display = 'none';
             document.getElementById('q-loading-box').style.display = 'block';
 
             // 🚨 VALIDAÇÃO BÁSICA NO FRONT 🚨
