@@ -462,7 +462,13 @@
         openBtn.innerHTML = stampImageHTML;
 
 
-        const imgContainers = ['.product__media-wrapper', '.product-gallery__media', '.product__media', '.product-image-main', '.product-media-container', '[data-media-id]', '.product__media-item', '.product-gallery', '.product-single__media', '.media-gallery'];
+        const imgContainers = [
+            '.product__media-wrapper', '.product-gallery__media', '.product__media',
+            '.product-image-main', '.product-media-container', '[data-media-id]',
+            '.product__media-item', '.product-gallery', '.product-single__media',
+            '.media-gallery', '.js-product-container', '.product-image-container',
+            '.js-product-image-container', '.product-image'
+        ];
         let placed = false;
         for (const sel of imgContainers) {
             const el = document.querySelector(sel);
@@ -769,6 +775,8 @@
     // ─── EXECUTA APENAS EM PÁGINAS DE PRODUTO ────────────────────────────────────
     // ─── EXECUTA EM PÁGINAS DE PRODUTO OU NO PREVIEW ─────────────────────────────
     const isProductPage = window.location.pathname.includes('/products/') ||
+        window.location.pathname.includes('/produto/') ||
+        window.location.pathname.includes('/produtos/') ||
         window.location.pathname.includes('preview.html') ||
         window.location.protocol === 'file:';
 
