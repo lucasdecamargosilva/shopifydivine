@@ -219,6 +219,11 @@
             max-width: 340px;
             animation: q-pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        /* Remover efeitos dos botões do aviso */
+        .q-popup-box .q-btn-black:hover { background: #000 !important; color: #fff !important; }
+        .q-popup-box .q-btn-outline:hover { background: #fff !important; color: #ef4444 !important; }
+        .q-popup-box button { transition: none !important; }
+
         @keyframes q-pop-in {
             from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
