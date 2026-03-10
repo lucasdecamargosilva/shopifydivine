@@ -200,6 +200,34 @@
         .q-content-scroll::-webkit-scrollbar { width: 4px; }
         .q-content-scroll::-webkit-scrollbar-thumb { background: #e5e5e5; }
 
+        #q-step-confirm {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .q-confirm-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 380px;
+            padding: 40px 30px;
+            border: 1px solid #000;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: q-popup-zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes q-popup-zoom {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
 
         /* ════════════════════════════════════════════
            LAYOUT PC — TELA DE RESULTADO
@@ -346,22 +374,29 @@
                         <button class="q-btn-black" id="q-btn-generate" disabled>Ver no meu corpo</button>
                     </div>
 
-                    <!-- NOVO: Passo de Confirmação -->
-                    <div id="q-step-confirm" style="display:none;text-align:center;">
-                        <h2 style="margin:0 0 10px 0;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#b45309;">Sua foto segue os requisitos abaixo?</h2>
-                        <div id="q-confirm-preview" style="width:160px;height:220px;margin:0 auto 20px;border:1px solid var(--q-border);overflow:hidden;">
-                            <img id="q-confirm-img" style="width:100%;height:100%;object-fit:cover;">
+                    <!-- PASSO DE CONFIRMAÇÃO (CENTERED POP-UP) -->
+                    <div id="q-step-confirm">
+                        <div class="q-confirm-box">
+                            <h2 style="margin:0 0 30px 0;font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#000;line-height:1.4;">Sua foto segue estes requisitos?</h2>
+                            
+                            <div class="q-tips-grid" style="margin-bottom:35px; border-top:none; border-bottom:none; padding:0;">
+                                <div class="q-tip-item">
+                                    <i class="ph ph-t-shirt" style="font-size:24px;"></i>
+                                    <span style="font-size:8px;">Com Roupa</span>
+                                </div>
+                                <div class="q-tip-item">
+                                    <i class="ph ph-person" style="font-size:24px;"></i>
+                                    <span style="font-size:8px;">Corpo Inteiro</span>
+                                </div>
+                                <div class="q-tip-item">
+                                    <i class="ph ph-sun" style="font-size:24px;"></i>
+                                    <span style="font-size:8px;">Boa Luz</span>
+                                </div>
+                            </div>
+
+                            <button class="q-btn-black" id="q-btn-confirm-yes" style="margin-top:0; padding: 20px 0;">SIM, GERAR FOTO</button>
+                            <button class="q-btn-outline" id="q-btn-confirm-no" style="margin-top:15px; border-color:#ef4444; color:#ef4444; padding: 18px 0; background:none;">NÃO, QUERO TROCAR</button>
                         </div>
-                        <div class="q-tips-grid" style="margin-bottom:25px;">
-                            <div class="q-tip-item"><i class="ph ph-t-shirt"></i><span>Com Roupa</span></div>
-                            <div class="q-tip-item"><i class="ph ph-person"></i><span>Corpo Inteiro</span></div>
-                            <div class="q-tip-item"><i class="ph ph-sun"></i><span>Boa Luz</span></div>
-                        </div>
-                        <div style="margin-bottom:30px;padding:12px;background:#fff8e1;border-bottom:2px solid #f59e0b;font-size:10px;font-weight:600;color:#92400e;line-height:1.5;">
-                            Se o produto for de costas, tire a foto de costas. Se for frente, tire de frente.
-                        </div>
-                        <button class="q-btn-black" id="q-btn-confirm-yes" style="margin-top:0;background:#059669;border-color:#059669;">SIM, GERAR FOTO</button>
-                        <button class="q-btn-outline" id="q-btn-confirm-no" style="margin-top:10px;border-color:#ef4444;color:#ef4444;">NÃO, TROCAR FOTO</button>
                     </div>
 
 
@@ -483,7 +518,6 @@
         const confirmStep = document.getElementById('q-step-confirm');
         const confirmBtnYes = document.getElementById('q-btn-confirm-yes');
         const confirmBtnNo = document.getElementById('q-btn-confirm-no');
-        const confirmImg = document.getElementById('q-confirm-img');
         const uploadStep = document.getElementById('q-step-upload');
 
         const closeBtn = document.getElementById('q-close-btn');
@@ -585,22 +619,17 @@
 
 
         genBtn.onclick = () => {
-            const rd = new FileReader();
-            rd.onload = ev => {
-                confirmImg.src = ev.target.result;
-                uploadStep.style.display = 'none';
-                confirmStep.style.display = 'block';
-            };
-            rd.readAsDataURL(userPhoto);
+            if (!userPhoto) return;
+            confirmStep.style.display = 'flex';
         };
 
         confirmBtnNo.onclick = () => {
             confirmStep.style.display = 'none';
-            uploadStep.style.display = 'block';
         };
 
         confirmBtnYes.onclick = async () => {
             confirmStep.style.display = 'none';
+            uploadStep.style.display = 'none';
             document.getElementById('q-loading-box').style.display = 'block';
 
             // 🚨 VALIDAÇÃO BÁSICA NO FRONT 🚨
