@@ -73,10 +73,13 @@ N8N retorna pagina HTML de sucesso ao lojista
 POST https://{api_address}/auth
 Content-Type: application/x-www-form-urlencoded
 
-consumer_key=2186aed7c9bd75669c578f1410ca5ae27db90a019dad66bcc408cb5c2cd8b471
-consumer_secret=670a29ee17a01e3b59ae98e7f8c7040ee5d9218ae8be2a5787a3b47fa7d436da
+consumer_key={TRAY_CONSUMER_KEY}   # armazenado nas credenciais do N8N
+consumer_secret={TRAY_CONSUMER_SECRET}  # armazenado nas credenciais do N8N
 code={code}
 ```
+
+> As chaves consumer_key e consumer_secret devem ser configuradas no
+> credential store do N8N (nome: "Tray OAuth - Provou Levou"), nunca hardcoded.
 
 Resposta esperada:
 ```json
@@ -194,8 +197,7 @@ Essas colunas permitem renovar tokens e gerenciar lojas futuramente.
 
 ## Credenciais da Integracao Tray
 
-- **Consumer Key:** `2186aed7c9bd75669c578f1410ca5ae27db90a019dad66bcc408cb5c2cd8b471`
-- **Consumer Secret:** `670a29ee17a01e3b59ae98e7f8c7040ee5d9218ae8be2a5787a3b47fa7d436da`
+- **Consumer Key e Consumer Secret:** armazenados no credential store do N8N (nome: "Tray OAuth - Provou Levou"). Nunca commitar em codigo ou documentacao.
 - **Callback URL:** `https://n8n.segredosdodrop.com/webhook/tray-install`
 
 ---
@@ -209,13 +211,62 @@ Essas colunas permitem renovar tokens e gerenciar lojas futuramente.
 
 ---
 
+## Tratamento de Erros
+
+| Cenario | Acao |
+|---|---|
+| Code invalido ou expirado (Node 1 falha) | Retornar HTML: "Autorizacao falhou. Tente instalar novamente." |
+| Loja ja existe no banco (reinstalacao) | Usar `INSERT ... ON CONFLICT (domain) DO UPDATE` para atualizar tokens e API key |
+| Injecao do script falha (Node 5 falha) | Salvar loja com `status = "install_failed"` para retry manual |
+
+---
+
+## Renovacao de Tokens
+
+Criar um workflow N8N agendado (cron) que roda diariamente:
+
+1. `SELECT` lojas com `token_expiration` nos proximos 7 dias
+2. Para cada loja: `GET {api_address}/auth?refresh_token={refresh_token}`
+3. Atualizar `access_token`, `refresh_token` e `token_expiration` no banco
+
+---
+
+## Script Generico — Adaptacoes para Multi-Loja
+
+O `provador-tray.js` precisa ser adaptado do `provador-v3.js` da Mariana Cardoso:
+
+- **Logo:** Substituir logo fixo da Mariana Cardoso pelo logo do Provou Levou (generico)
+- **Log:** Alterar mensagem de "Provador Virtual Mariana Cardoso" para "Provador Virtual Provou Levou"
+- **Deteccao de produto:** Manter regex generico (funciona para a maioria das lojas de moda)
+- **Tabelas de tamanhos:** Manter grades atuais como padrao (sao grades universais)
+
+---
+
+## Nota de Seguranca — API Key na URL
+
+A API key e passada como query parameter na URL do script (`?key=pl_live_xxx`), ficando visivel no HTML da pagina. Isso e aceitavel porque:
+
+- A key so autentica requisicoes de try-on (upload de fotos), nao operacoes administrativas
+- O risco maximo de vazamento e alguem usar a cota de try-on de outra loja
+- O workflow Quantic Materialize ja valida domain + key + status, mitigando abuso
+
+---
+
+## Idempotencia
+
+Antes de injetar o script (Node 5), verificar se ja existe:
+
+1. `GET {api_address}/scripts?access_token=...`
+2. Se ja houver script com source contendo `provador-tray.js`, pular injecao
+
+---
+
 ## Fluxo de Teste
 
-1. Acessar loja de teste: `https://loja-s.tray.com.br/adm/login.php?loja=1225878`
-2. Login: `lcamargo@quanticsolutions.com.br` / `Trayteste@321`
-3. Ir em Aplicativos > Instalar novos aplicativos
-4. Buscar "Provou Levou" e instalar
-5. Tray redireciona para o webhook N8N
-6. Verificar no banco se a loja foi registrada
-7. Verificar na loja se o script foi injetado
-8. Testar o provador virtual na loja
+1. Acessar loja de teste (ID: 1225878) — credenciais no gerenciador de senhas
+2. Ir em Aplicativos > Instalar novos aplicativos
+3. Buscar "Provou Levou" e instalar
+4. Tray redireciona para o webhook N8N
+5. Verificar no banco se a loja foi registrada
+6. Verificar na loja se o script foi injetado
+7. Testar o provador virtual na loja
