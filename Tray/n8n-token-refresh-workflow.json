@@ -1,0 +1,298 @@
+{
+    "updatedAt": "2026-03-14T19:01:48.580Z",
+    "createdAt": "2026-03-14T19:01:48.580Z",
+    "id": "jICysQIaTSNeWroA",
+    "name": "[Tray Token Refresh] Provou Levou",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 24
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                0,
+                0
+            ],
+            "name": "Cron Diario",
+            "id": "0d9c847b-a49c-46b3-b2f8-abdf07d9be4e"
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "SELECT id, domain, refresh_token, api_address FROM provou_levou_stores WHERE platform = 'tray' AND token_expiration IS NOT NULL AND token_expiration < NOW() + INTERVAL '7 days' AND status IN ('Ativo', 'Teste Gratuito');",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.6,
+            "position": [
+                220,
+                0
+            ],
+            "name": "Buscar Tokens Expirando",
+            "credentials": {
+                "postgres": {
+                    "id": "MwESWrWXk2YtoYba",
+                    "name": "Postgres account"
+                }
+            },
+            "id": "13ae79e2-1c19-4f54-8443-6238590a5288"
+        },
+        {
+            "parameters": {
+                "url": "=https://{{ $json.api_address }}/auth?refresh_token={{ $json.refresh_token }}",
+                "options": {
+                    "timeout": 15000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.4,
+            "position": [
+                440,
+                0
+            ],
+            "name": "Refresh Token Tray",
+            "onError": "continueErrorOutput",
+            "id": "801177b7-225f-4437-93e4-c4a7eb3241fe"
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "=UPDATE provou_levou_stores SET access_token = '{{ $json.access_token }}', refresh_token = '{{ $json.refresh_token }}', token_expiration = '{{ $json.date_expiration_access_token }}' WHERE id = {{ $('Buscar Tokens Expirando').item.json.id }};",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.6,
+            "position": [
+                660,
+                0
+            ],
+            "name": "Atualizar Tokens no Banco",
+            "credentials": {
+                "postgres": {
+                    "id": "MwESWrWXk2YtoYba",
+                    "name": "Postgres account"
+                }
+            },
+            "id": "af725d31-e2f6-4daf-b71d-b13807045694"
+        }
+    ],
+    "connections": {
+        "Cron Diario": {
+            "main": [
+                [
+                    {
+                        "node": "Buscar Tokens Expirando",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Buscar Tokens Expirando": {
+            "main": [
+                [
+                    {
+                        "node": "Refresh Token Tray",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Refresh Token Tray": {
+            "main": [
+                [
+                    {
+                        "node": "Atualizar Tokens no Banco",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "callerPolicy": "workflowsFromSameOwner",
+        "availableInMCP": false
+    },
+    "staticData": {
+        "node:Cron Diario": {
+            "recurrenceRules": []
+        }
+    },
+    "meta": null,
+    "pinData": null,
+    "versionId": "6a10d41b-d237-425b-b22d-a0f7dedca261",
+    "activeVersionId": "6a10d41b-d237-425b-b22d-a0f7dedca261",
+    "versionCounter": 4,
+    "triggerCount": 1,
+    "shared": [
+        {
+            "updatedAt": "2026-03-14T19:01:48.590Z",
+            "createdAt": "2026-03-14T19:01:48.590Z",
+            "role": "workflow:owner",
+            "workflowId": "jICysQIaTSNeWroA",
+            "projectId": "aZsFu5amyU65tm10",
+            "project": {
+                "updatedAt": "2025-12-22T02:43:58.653Z",
+                "createdAt": "2025-08-25T19:48:31.965Z",
+                "id": "aZsFu5amyU65tm10",
+                "name": "Lucas de Camargo <lucasdecamargo2015@gmail.com>",
+                "type": "personal",
+                "icon": null,
+                "description": null,
+                "creatorId": "b410c4aa-656d-4583-a184-4f978657caf8"
+            }
+        }
+    ],
+    "tags": [],
+    "activeVersion": {
+        "updatedAt": "2026-03-14T19:01:48.661Z",
+        "createdAt": "2026-03-14T19:01:48.661Z",
+        "versionId": "6a10d41b-d237-425b-b22d-a0f7dedca261",
+        "workflowId": "jICysQIaTSNeWroA",
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "hours",
+                                "hoursInterval": 24
+                            }
+                        ]
+                    }
+                },
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1.2,
+                "position": [
+                    0,
+                    0
+                ],
+                "name": "Cron Diario",
+                "id": "0d9c847b-a49c-46b3-b2f8-abdf07d9be4e"
+            },
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "SELECT id, domain, refresh_token, api_address FROM provou_levou_stores WHERE platform = 'tray' AND token_expiration IS NOT NULL AND token_expiration < NOW() + INTERVAL '7 days' AND status IN ('Ativo', 'Teste Gratuito');",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.6,
+                "position": [
+                    220,
+                    0
+                ],
+                "name": "Buscar Tokens Expirando",
+                "credentials": {
+                    "postgres": {
+                        "id": "MwESWrWXk2YtoYba",
+                        "name": "Postgres account"
+                    }
+                },
+                "id": "13ae79e2-1c19-4f54-8443-6238590a5288"
+            },
+            {
+                "parameters": {
+                    "url": "=https://{{ $json.api_address }}/auth?refresh_token={{ $json.refresh_token }}",
+                    "options": {
+                        "timeout": 15000
+                    }
+                },
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.4,
+                "position": [
+                    440,
+                    0
+                ],
+                "name": "Refresh Token Tray",
+                "onError": "continueErrorOutput",
+                "id": "801177b7-225f-4437-93e4-c4a7eb3241fe"
+            },
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "=UPDATE provou_levou_stores SET access_token = '{{ $json.access_token }}', refresh_token = '{{ $json.refresh_token }}', token_expiration = '{{ $json.date_expiration_access_token }}' WHERE id = {{ $('Buscar Tokens Expirando').item.json.id }};",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.6,
+                "position": [
+                    660,
+                    0
+                ],
+                "name": "Atualizar Tokens no Banco",
+                "credentials": {
+                    "postgres": {
+                        "id": "MwESWrWXk2YtoYba",
+                        "name": "Postgres account"
+                    }
+                },
+                "id": "af725d31-e2f6-4daf-b71d-b13807045694"
+            }
+        ],
+        "connections": {
+            "Cron Diario": {
+                "main": [
+                    [
+                        {
+                            "node": "Buscar Tokens Expirando",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Buscar Tokens Expirando": {
+                "main": [
+                    [
+                        {
+                            "node": "Refresh Token Tray",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Refresh Token Tray": {
+                "main": [
+                    [
+                        {
+                            "node": "Atualizar Tokens no Banco",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    []
+                ]
+            }
+        },
+        "authors": "Lucas de Camargo",
+        "name": null,
+        "description": null,
+        "autosaved": false,
+        "workflowPublishHistory": [
+            {
+                "createdAt": "2026-03-14T19:02:56.423Z",
+                "id": 733,
+                "workflowId": "jICysQIaTSNeWroA",
+                "versionId": "6a10d41b-d237-425b-b22d-a0f7dedca261",
+                "event": "activated",
+                "userId": "b410c4aa-656d-4583-a184-4f978657caf8"
+            }
+        ]
+    }
+}

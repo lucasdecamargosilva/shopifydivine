@@ -1,0 +1,894 @@
+{
+    "updatedAt": "2026-03-14T18:59:49.773Z",
+    "createdAt": "2026-03-14T18:59:49.773Z",
+    "id": "AfO0QfRkje71LdFY",
+    "name": "[Tray Install] Provou Levou",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "GET",
+                "path": "tray-install",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                0,
+                0
+            ],
+            "name": "Webhook Tray Callback",
+            "id": "abc9f564-42d7-460f-846f-4f39df65bff0"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://{{ $json.query.api_address }}/auth",
+                "sendBody": true,
+                "contentType": "form-urlencoded",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "consumer_key",
+                            "value": "2186aed7c9bd75669c578f1410ca5ae27db90a019dad66bcc408cb5c2cd8b471"
+                        },
+                        {
+                            "name": "consumer_secret",
+                            "value": "670a29ee17a01e3b59ae98e7f8c7040ee5d9218ae8be2a5787a3b47fa7d436da"
+                        },
+                        {
+                            "name": "code",
+                            "value": "={{ $json.query.code }}"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 30000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.4,
+            "position": [
+                220,
+                0
+            ],
+            "name": "Trocar Code por Tokens",
+            "onError": "continueErrorOutput",
+            "id": "fa13f7bc-3dd7-42b4-a3d8-c76354ed3c1d"
+        },
+        {
+            "parameters": {
+                "respondWith": "text",
+                "responseBody": "<html><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;}div{text-align:center;background:white;padding:40px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);max-width:500px;}h1{color:#e74c3c;margin-bottom:16px;}p{color:#555;line-height:1.6;}</style></head><body><div><h1>Falha na autorizacao</h1><p>Nao foi possivel conectar com sua loja. Por favor, tente instalar o app novamente.</p></div></body></html>",
+                "options": {
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "Content-Type",
+                                "value": "text/html; charset=utf-8"
+                            }
+                        ]
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [
+                440,
+                200
+            ],
+            "name": "Erro Auth",
+            "id": "b2a04a5d-5d2a-48e1-a6db-f52aeeb78146"
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "const crypto = require('crypto');\nconst storeHost = $('Webhook Tray Callback').item.json.query.store_host || '';\nif (!storeHost || storeHost.length < 4) throw new Error('store_host invalido: ' + storeHost);\nconst randomHex = crypto.randomBytes(32).toString('hex');\nconst apiKey = 'pl_live_' + randomHex;\nconst apiKeyHash = crypto.createHash('sha256').update(apiKey).digest('hex');\nconst domain = storeHost.startsWith('https://') ? storeHost : 'https://' + storeHost;\n\nreturn {\n  api_key: apiKey,\n  api_key_hash: apiKeyHash,\n  access_token: $json.access_token,\n  refresh_token: $json.refresh_token,\n  token_expiration: $json.date_expiration_access_token,\n  store_id: $json.store_id || $('Webhook Tray Callback').item.json.query.store,\n  api_address: $('Webhook Tray Callback').item.json.query.api_address,\n  domain: domain\n};"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                440,
+                0
+            ],
+            "name": "Gerar API Key + Hash",
+            "id": "38604bef-858d-4c16-9eb6-b7dc79dab866"
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "schema": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "public"
+                },
+                "table": {
+                    "__rl": true,
+                    "value": "provou_levou_stores",
+                    "mode": "list"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "domain": "={{ $json.domain }}",
+                        "api_key_hash": "={{ $json.api_key_hash }}",
+                        "status": "Teste Gratuito",
+                        "access_token": "={{ $json.access_token }}",
+                        "refresh_token": "={{ $json.refresh_token }}",
+                        "token_expiration": "={{ $json.token_expiration }}",
+                        "store_id": "={{ $json.store_id }}",
+                        "api_address": "={{ $json.api_address }}",
+                        "platform": "tray"
+                    },
+                    "matchingColumns": [
+                        "domain"
+                    ]
+                },
+                "options": {
+                    "onConflict": "updateOnConflict"
+                }
+            },
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.6,
+            "position": [
+                660,
+                0
+            ],
+            "name": "Salvar Loja no Banco",
+            "credentials": {
+                "postgres": {
+                    "id": "MwESWrWXk2YtoYba",
+                    "name": "Postgres account"
+                }
+            },
+            "id": "6bb821ad-0894-43e5-b20e-a497e225db1c"
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "=https://{{ $('Gerar API Key + Hash').item.json.api_address }}/scripts?access_token={{ $('Gerar API Key + Hash').item.json.access_token }}",
+                "options": {
+                    "timeout": 15000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.4,
+            "position": [
+                880,
+                0
+            ],
+            "name": "Listar Scripts Existentes",
+            "id": "1834c3e1-fbd6-43da-bf1f-368decbf1a28"
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "const scripts = $json.ExternalScripts || [];\nconst alreadyInstalled = scripts.some(s => s.ExternalScript && s.ExternalScript.source && s.ExternalScript.source.includes('provador-tray'));\nconst apiKey = $('Gerar API Key + Hash').item.json.api_key;\nconst scriptUrl = 'https://lojista.provoulevou.com.br/provador-tray.js?key=' + apiKey;\n\nreturn {\n  already_installed: alreadyInstalled,\n  script_url: scriptUrl,\n  access_token: $('Gerar API Key + Hash').item.json.access_token,\n  api_address: $('Gerar API Key + Hash').item.json.api_address\n};"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1100,
+                0
+            ],
+            "name": "Verificar Idempotencia",
+            "id": "7504b1dc-cb1b-4420-94a3-899a6ac9160f"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "leftValue": "={{ $json.already_installed }}",
+                            "rightValue": true,
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "false",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [
+                1320,
+                0
+            ],
+            "name": "Ja Instalado?",
+            "id": "cab27af5-7eeb-4535-851e-97cf3f2cae1b"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://{{ $json.api_address }}/scripts?access_token={{ $json.access_token }}",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={ \"ExternalScript\": { \"source\": \"{{ $json.script_url }}\" } }",
+                "options": {
+                    "timeout": 15000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.4,
+            "position": [
+                1540,
+                -100
+            ],
+            "name": "Injetar Script na Loja",
+            "onError": "continueErrorOutput",
+            "id": "c6477d81-1139-43cc-9d3a-d3ce07500bc0"
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "=UPDATE provou_levou_stores SET status = 'install_failed' WHERE domain = '{{ $('Gerar API Key + Hash').item.json.domain.replace(/'/g, \"''\") }}' AND platform = 'tray';",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.6,
+            "position": [
+                1760,
+                -200
+            ],
+            "name": "Marcar Install Failed",
+            "credentials": {
+                "postgres": {
+                    "id": "MwESWrWXk2YtoYba",
+                    "name": "Postgres account"
+                }
+            },
+            "id": "bdfa639e-ef1e-4d8e-9726-54fcebf785fb"
+        },
+        {
+            "parameters": {
+                "respondWith": "text",
+                "responseBody": "<html><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;}div{text-align:center;background:white;padding:40px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);max-width:500px;}h1{color:#e67e22;margin-bottom:16px;}p{color:#555;line-height:1.6;}</style></head><body><div><h1>Instalacao parcial</h1><p>Sua loja foi registrada mas houve um erro ao injetar o script. Nossa equipe sera notificada e o problema sera resolvido em breve.</p></div></body></html>",
+                "options": {
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "Content-Type",
+                                "value": "text/html; charset=utf-8"
+                            }
+                        ]
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [
+                1980,
+                -200
+            ],
+            "name": "Erro Inject",
+            "id": "6e6032b2-2163-41cd-84cd-05085432203d"
+        },
+        {
+            "parameters": {
+                "respondWith": "text",
+                "responseBody": "<html><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;}div{text-align:center;background:white;padding:40px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);max-width:500px;}h1{color:#2ecc71;margin-bottom:16px;}p{color:#555;line-height:1.6;}</style></head><body><div><h1>Provou Levou instalado com sucesso!</h1><p>O provador virtual ja esta ativo na sua loja. Seus clientes podem comecar a experimentar roupas virtualmente agora mesmo.</p></div></body></html>",
+                "options": {
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "Content-Type",
+                                "value": "text/html; charset=utf-8"
+                            }
+                        ]
+                    }
+                }
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [
+                1760,
+                0
+            ],
+            "name": "Sucesso",
+            "id": "7b1256d5-5992-4a2b-8c73-f67a1180ad4a"
+        }
+    ],
+    "connections": {
+        "Webhook Tray Callback": {
+            "main": [
+                [
+                    {
+                        "node": "Trocar Code por Tokens",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Trocar Code por Tokens": {
+            "main": [
+                [
+                    {
+                        "node": "Gerar API Key + Hash",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Erro Auth",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gerar API Key + Hash": {
+            "main": [
+                [
+                    {
+                        "node": "Salvar Loja no Banco",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Salvar Loja no Banco": {
+            "main": [
+                [
+                    {
+                        "node": "Listar Scripts Existentes",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Listar Scripts Existentes": {
+            "main": [
+                [
+                    {
+                        "node": "Verificar Idempotencia",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Verificar Idempotencia": {
+            "main": [
+                [
+                    {
+                        "node": "Ja Instalado?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Ja Instalado?": {
+            "main": [
+                [
+                    {
+                        "node": "Injetar Script na Loja",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Sucesso",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Injetar Script na Loja": {
+            "main": [
+                [
+                    {
+                        "node": "Sucesso",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Marcar Install Failed",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Marcar Install Failed": {
+            "main": [
+                [
+                    {
+                        "node": "Erro Inject",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "callerPolicy": "workflowsFromSameOwner",
+        "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "33882ac5-bb3c-4ba7-99f3-646dff7fd634",
+    "activeVersionId": "33882ac5-bb3c-4ba7-99f3-646dff7fd634",
+    "versionCounter": 3,
+    "triggerCount": 1,
+    "shared": [
+        {
+            "updatedAt": "2026-03-14T18:59:49.774Z",
+            "createdAt": "2026-03-14T18:59:49.774Z",
+            "role": "workflow:owner",
+            "workflowId": "AfO0QfRkje71LdFY",
+            "projectId": "aZsFu5amyU65tm10",
+            "project": {
+                "updatedAt": "2025-12-22T02:43:58.653Z",
+                "createdAt": "2025-08-25T19:48:31.965Z",
+                "id": "aZsFu5amyU65tm10",
+                "name": "Lucas de Camargo <lucasdecamargo2015@gmail.com>",
+                "type": "personal",
+                "icon": null,
+                "description": null,
+                "creatorId": "b410c4aa-656d-4583-a184-4f978657caf8"
+            }
+        }
+    ],
+    "tags": [],
+    "activeVersion": {
+        "updatedAt": "2026-03-14T18:59:49.777Z",
+        "createdAt": "2026-03-14T18:59:49.777Z",
+        "versionId": "33882ac5-bb3c-4ba7-99f3-646dff7fd634",
+        "workflowId": "AfO0QfRkje71LdFY",
+        "nodes": [
+            {
+                "parameters": {
+                    "httpMethod": "GET",
+                    "path": "tray-install",
+                    "responseMode": "responseNode",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2.1,
+                "position": [
+                    0,
+                    0
+                ],
+                "name": "Webhook Tray Callback",
+                "id": "abc9f564-42d7-460f-846f-4f39df65bff0"
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "=https://{{ $json.query.api_address }}/auth",
+                    "sendBody": true,
+                    "contentType": "form-urlencoded",
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "consumer_key",
+                                "value": "2186aed7c9bd75669c578f1410ca5ae27db90a019dad66bcc408cb5c2cd8b471"
+                            },
+                            {
+                                "name": "consumer_secret",
+                                "value": "670a29ee17a01e3b59ae98e7f8c7040ee5d9218ae8be2a5787a3b47fa7d436da"
+                            },
+                            {
+                                "name": "code",
+                                "value": "={{ $json.query.code }}"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "timeout": 30000
+                    }
+                },
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.4,
+                "position": [
+                    220,
+                    0
+                ],
+                "name": "Trocar Code por Tokens",
+                "onError": "continueErrorOutput",
+                "id": "fa13f7bc-3dd7-42b4-a3d8-c76354ed3c1d"
+            },
+            {
+                "parameters": {
+                    "respondWith": "text",
+                    "responseBody": "<html><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;}div{text-align:center;background:white;padding:40px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);max-width:500px;}h1{color:#e74c3c;margin-bottom:16px;}p{color:#555;line-height:1.6;}</style></head><body><div><h1>Falha na autorizacao</h1><p>Nao foi possivel conectar com sua loja. Por favor, tente instalar o app novamente.</p></div></body></html>",
+                    "options": {
+                        "responseHeaders": {
+                            "entries": [
+                                {
+                                    "name": "Content-Type",
+                                    "value": "text/html; charset=utf-8"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "n8n-nodes-base.respondToWebhook",
+                "typeVersion": 1.5,
+                "position": [
+                    440,
+                    200
+                ],
+                "name": "Erro Auth",
+                "id": "b2a04a5d-5d2a-48e1-a6db-f52aeeb78146"
+            },
+            {
+                "parameters": {
+                    "mode": "runOnceForEachItem",
+                    "jsCode": "const crypto = require('crypto');\nconst storeHost = $('Webhook Tray Callback').item.json.query.store_host || '';\nif (!storeHost || storeHost.length < 4) throw new Error('store_host invalido: ' + storeHost);\nconst randomHex = crypto.randomBytes(32).toString('hex');\nconst apiKey = 'pl_live_' + randomHex;\nconst apiKeyHash = crypto.createHash('sha256').update(apiKey).digest('hex');\nconst domain = storeHost.startsWith('https://') ? storeHost : 'https://' + storeHost;\n\nreturn {\n  api_key: apiKey,\n  api_key_hash: apiKeyHash,\n  access_token: $json.access_token,\n  refresh_token: $json.refresh_token,\n  token_expiration: $json.date_expiration_access_token,\n  store_id: $json.store_id || $('Webhook Tray Callback').item.json.query.store,\n  api_address: $('Webhook Tray Callback').item.json.query.api_address,\n  domain: domain\n};"
+                },
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    440,
+                    0
+                ],
+                "name": "Gerar API Key + Hash",
+                "id": "38604bef-858d-4c16-9eb6-b7dc79dab866"
+            },
+            {
+                "parameters": {
+                    "operation": "insert",
+                    "schema": {
+                        "__rl": true,
+                        "mode": "list",
+                        "value": "public"
+                    },
+                    "table": {
+                        "__rl": true,
+                        "value": "provou_levou_stores",
+                        "mode": "list"
+                    },
+                    "columns": {
+                        "mappingMode": "defineBelow",
+                        "value": {
+                            "domain": "={{ $json.domain }}",
+                            "api_key_hash": "={{ $json.api_key_hash }}",
+                            "status": "Teste Gratuito",
+                            "access_token": "={{ $json.access_token }}",
+                            "refresh_token": "={{ $json.refresh_token }}",
+                            "token_expiration": "={{ $json.token_expiration }}",
+                            "store_id": "={{ $json.store_id }}",
+                            "api_address": "={{ $json.api_address }}",
+                            "platform": "tray"
+                        },
+                        "matchingColumns": [
+                            "domain"
+                        ]
+                    },
+                    "options": {
+                        "onConflict": "updateOnConflict"
+                    }
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.6,
+                "position": [
+                    660,
+                    0
+                ],
+                "name": "Salvar Loja no Banco",
+                "credentials": {
+                    "postgres": {
+                        "id": "MwESWrWXk2YtoYba",
+                        "name": "Postgres account"
+                    }
+                },
+                "id": "6bb821ad-0894-43e5-b20e-a497e225db1c"
+            },
+            {
+                "parameters": {
+                    "method": "GET",
+                    "url": "=https://{{ $('Gerar API Key + Hash').item.json.api_address }}/scripts?access_token={{ $('Gerar API Key + Hash').item.json.access_token }}",
+                    "options": {
+                        "timeout": 15000
+                    }
+                },
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.4,
+                "position": [
+                    880,
+                    0
+                ],
+                "name": "Listar Scripts Existentes",
+                "id": "1834c3e1-fbd6-43da-bf1f-368decbf1a28"
+            },
+            {
+                "parameters": {
+                    "mode": "runOnceForEachItem",
+                    "jsCode": "const scripts = $json.ExternalScripts || [];\nconst alreadyInstalled = scripts.some(s => s.ExternalScript && s.ExternalScript.source && s.ExternalScript.source.includes('provador-tray'));\nconst apiKey = $('Gerar API Key + Hash').item.json.api_key;\nconst scriptUrl = 'https://lojista.provoulevou.com.br/provador-tray.js?key=' + apiKey;\n\nreturn {\n  already_installed: alreadyInstalled,\n  script_url: scriptUrl,\n  access_token: $('Gerar API Key + Hash').item.json.access_token,\n  api_address: $('Gerar API Key + Hash').item.json.api_address\n};"
+                },
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    1100,
+                    0
+                ],
+                "name": "Verificar Idempotencia",
+                "id": "7504b1dc-cb1b-4420-94a3-899a6ac9160f"
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "options": {
+                            "caseSensitive": true,
+                            "leftValue": "",
+                            "typeValidation": "strict",
+                            "version": 3
+                        },
+                        "conditions": [
+                            {
+                                "leftValue": "={{ $json.already_installed }}",
+                                "rightValue": true,
+                                "operator": {
+                                    "type": "boolean",
+                                    "operation": "false",
+                                    "singleValue": true
+                                }
+                            }
+                        ],
+                        "combinator": "and"
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 2.3,
+                "position": [
+                    1320,
+                    0
+                ],
+                "name": "Ja Instalado?",
+                "id": "cab27af5-7eeb-4535-851e-97cf3f2cae1b"
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "=https://{{ $json.api_address }}/scripts?access_token={{ $json.access_token }}",
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={ \"ExternalScript\": { \"source\": \"{{ $json.script_url }}\" } }",
+                    "options": {
+                        "timeout": 15000
+                    }
+                },
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.4,
+                "position": [
+                    1540,
+                    -100
+                ],
+                "name": "Injetar Script na Loja",
+                "onError": "continueErrorOutput",
+                "id": "c6477d81-1139-43cc-9d3a-d3ce07500bc0"
+            },
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "=UPDATE provou_levou_stores SET status = 'install_failed' WHERE domain = '{{ $('Gerar API Key + Hash').item.json.domain.replace(/'/g, \"''\") }}' AND platform = 'tray';",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.6,
+                "position": [
+                    1760,
+                    -200
+                ],
+                "name": "Marcar Install Failed",
+                "credentials": {
+                    "postgres": {
+                        "id": "MwESWrWXk2YtoYba",
+                        "name": "Postgres account"
+                    }
+                },
+                "id": "bdfa639e-ef1e-4d8e-9726-54fcebf785fb"
+            },
+            {
+                "parameters": {
+                    "respondWith": "text",
+                    "responseBody": "<html><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;}div{text-align:center;background:white;padding:40px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);max-width:500px;}h1{color:#e67e22;margin-bottom:16px;}p{color:#555;line-height:1.6;}</style></head><body><div><h1>Instalacao parcial</h1><p>Sua loja foi registrada mas houve um erro ao injetar o script. Nossa equipe sera notificada e o problema sera resolvido em breve.</p></div></body></html>",
+                    "options": {
+                        "responseHeaders": {
+                            "entries": [
+                                {
+                                    "name": "Content-Type",
+                                    "value": "text/html; charset=utf-8"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "n8n-nodes-base.respondToWebhook",
+                "typeVersion": 1.5,
+                "position": [
+                    1980,
+                    -200
+                ],
+                "name": "Erro Inject",
+                "id": "6e6032b2-2163-41cd-84cd-05085432203d"
+            },
+            {
+                "parameters": {
+                    "respondWith": "text",
+                    "responseBody": "<html><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;}div{text-align:center;background:white;padding:40px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);max-width:500px;}h1{color:#2ecc71;margin-bottom:16px;}p{color:#555;line-height:1.6;}</style></head><body><div><h1>Provou Levou instalado com sucesso!</h1><p>O provador virtual ja esta ativo na sua loja. Seus clientes podem comecar a experimentar roupas virtualmente agora mesmo.</p></div></body></html>",
+                    "options": {
+                        "responseHeaders": {
+                            "entries": [
+                                {
+                                    "name": "Content-Type",
+                                    "value": "text/html; charset=utf-8"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "n8n-nodes-base.respondToWebhook",
+                "typeVersion": 1.5,
+                "position": [
+                    1760,
+                    0
+                ],
+                "name": "Sucesso",
+                "id": "7b1256d5-5992-4a2b-8c73-f67a1180ad4a"
+            }
+        ],
+        "connections": {
+            "Webhook Tray Callback": {
+                "main": [
+                    [
+                        {
+                            "node": "Trocar Code por Tokens",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Trocar Code por Tokens": {
+                "main": [
+                    [
+                        {
+                            "node": "Gerar API Key + Hash",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Erro Auth",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gerar API Key + Hash": {
+                "main": [
+                    [
+                        {
+                            "node": "Salvar Loja no Banco",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Salvar Loja no Banco": {
+                "main": [
+                    [
+                        {
+                            "node": "Listar Scripts Existentes",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Listar Scripts Existentes": {
+                "main": [
+                    [
+                        {
+                            "node": "Verificar Idempotencia",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Verificar Idempotencia": {
+                "main": [
+                    [
+                        {
+                            "node": "Ja Instalado?",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Ja Instalado?": {
+                "main": [
+                    [
+                        {
+                            "node": "Injetar Script na Loja",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Sucesso",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Injetar Script na Loja": {
+                "main": [
+                    [
+                        {
+                            "node": "Sucesso",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Marcar Install Failed",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Marcar Install Failed": {
+                "main": [
+                    [
+                        {
+                            "node": "Erro Inject",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "authors": "Lucas de Camargo",
+        "name": null,
+        "description": null,
+        "autosaved": false,
+        "workflowPublishHistory": [
+            {
+                "createdAt": "2026-03-14T19:01:21.357Z",
+                "id": 732,
+                "workflowId": "AfO0QfRkje71LdFY",
+                "versionId": "33882ac5-bb3c-4ba7-99f3-646dff7fd634",
+                "event": "activated",
+                "userId": "b410c4aa-656d-4583-a184-4f978657caf8"
+            }
+        ]
+    }
+}
