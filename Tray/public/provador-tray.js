@@ -530,7 +530,8 @@
 
     `;
 
-    const stampImageHTML = `<img src="https://i.ibb.co/4wFQF9pb/provador-tag.webp" alt="Provador Virtual" style="width:100%;height:100%;object-fit:contain;">`;
+    const CABINE_ICON_URL = 'https://i.ibb.co/50TPgYj/cabine-icone-oficial.png';
+    const stampImageHTML = `<img src="${CABINE_ICON_URL}" alt="Provador Virtual" style="width:70%;height:70%;object-fit:contain;">`;
 
 
     const html = `
