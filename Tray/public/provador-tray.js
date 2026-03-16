@@ -877,7 +877,19 @@
             }
 
             if (!buyPlaced) {
-                LOG.warn('Nenhum botao de compra encontrado para posicionar botao inline');
+                // Tray loads product content dynamically — retry until buy button appears
+                var retryCount = 0;
+                var retryInterval = setInterval(function() {
+                    retryCount++;
+                    if (placeBuyButton()) {
+                        clearInterval(retryInterval);
+                        LOG.ok('Botao inline posicionado apos ' + retryCount + ' tentativa(s)');
+                        applyDesignToButtons();
+                    } else if (retryCount >= 20) {
+                        clearInterval(retryInterval);
+                        LOG.warn('Nenhum botao de compra encontrado apos 20 tentativas');
+                    }
+                }, 500);
             }
         }
 
@@ -1191,7 +1203,24 @@
         if (isProductPage) {
             init();
         } else {
-            LOG.warn('Página não é de produto — script não inicializado');
+            // Tray loads content dynamically — retry detection a few times
+            var detectRetry = 0;
+            var detectInterval = setInterval(function() {
+                detectRetry++;
+                var found =
+                    document.querySelector('.botao-comprar') !== null ||
+                    document.getElementById('form_comprar') !== null ||
+                    document.querySelector('#menuVars') !== null ||
+                    document.querySelector('.product-colum-right') !== null;
+                if (found) {
+                    clearInterval(detectInterval);
+                    LOG.ok('Página de produto detectada apos ' + detectRetry + ' tentativa(s)');
+                    init();
+                } else if (detectRetry >= 10) {
+                    clearInterval(detectInterval);
+                    LOG.warn('Página não é de produto — script não inicializado');
+                }
+            }, 500);
         }
     }
 
