@@ -9,6 +9,14 @@ import BuyButton from './preview/BuyButton';
 
 const CABINE_IMG_URL = 'https://i.ibb.co/50TPgYj/cabine-icone-oficial.png';
 
+const ANIM_STYLES = {
+  scale: { animation: 'mc-pulse-scale 2s ease-in-out infinite' },
+  glow: { animation: 'mc-glow 2s ease-in-out infinite' },
+  slide: { animation: 'mc-float 3s ease-in-out infinite' },
+  shake: { animation: 'mc-shake 3s infinite' },
+  none: {}
+};
+
 function MiniPhotoButton({ design }) {
   const bgStyle = design.gradient
     ? { background: `linear-gradient(${design.gradient.direction}, ${design.gradient.colors[0]}, ${design.gradient.colors[1]})` }
@@ -29,6 +37,7 @@ function MiniPhotoButton({ design }) {
       justifyContent: 'center',
       padding: '8px',
       boxShadow: design.shadow ? `0 4px 12px rgba(0,0,0,${design.shadowIntensity})` : 'none',
+      ...(ANIM_STYLES[design.hoverAnimation] || {}),
     }}>
       {showIcon && (
         <div style={{
@@ -51,7 +60,7 @@ function MiniPhotoButton({ design }) {
 
 const SECTIONS = [
   { id: 'colors', label: 'Cores', icon: '\u{1F3A8}', Component: ColorControl },
-  { id: 'text', label: 'Texto', icon: '\u{270F}\u{FE0F}', Component: TextControl },
+  { id: 'text', label: 'Texto', icon: '\u{270F}\u{FE0F}', Component: TextControl, onlyFor: 'buy_button' },
   { id: 'shape', label: 'Forma', icon: '\u{2B1C}', Component: ShapeControl },
   { id: 'icon', label: 'Icone', icon: '\u{2B50}', Component: IconControl },
   { id: 'effects', label: 'Efeitos', icon: '\u{2728}', Component: EffectsControl },
@@ -123,7 +132,7 @@ export default function EditorPanel({ design, activeButton, onChangeButton, onCh
 
       {/* Accordion sections */}
       <div className="flex-1 overflow-y-auto">
-        {SECTIONS.map(({ id, label, icon, Component }) => (
+        {SECTIONS.filter(s => !s.onlyFor || s.onlyFor === activeButton).map(({ id, label, icon, Component }) => (
           <div key={id} className="border-b border-gray-200">
             <button
               onClick={() => setOpenSection(openSection === id ? null : id)}

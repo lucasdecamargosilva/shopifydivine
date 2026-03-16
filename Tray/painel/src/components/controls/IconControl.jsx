@@ -1,7 +1,7 @@
 import React from 'react';
 import { ICON_OPTIONS } from '../../defaults';
 
-export default function IconControl({ design, onChange }) {
+export default function IconControl({ design, onChange, activeButton }) {
   return (
     <div className="space-y-3">
       <div>
@@ -28,24 +28,26 @@ export default function IconControl({ design, onChange }) {
       )}
       {design.icon !== 'none' && (
         <>
-          <div>
-            <label className="text-xs font-medium text-brand-gray">Posicao</label>
-            <div className="flex gap-2 mt-1">
-              {['left', 'right'].map(pos => (
-                <button
-                  key={pos}
-                  onClick={() => onChange('iconPosition', pos)}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition ${
-                    design.iconPosition === pos
-                      ? 'bg-brand-purple text-white'
-                      : 'bg-gray-100 text-brand-gray hover:bg-gray-200'
-                  }`}
-                >
-                  {pos === 'left' ? 'Esquerda' : 'Direita'}
-                </button>
-              ))}
+          {activeButton === 'buy_button' && (
+            <div>
+              <label className="text-xs font-medium text-brand-gray">Posicao</label>
+              <div className="flex gap-2 mt-1">
+                {['left', 'right'].map(pos => (
+                  <button
+                    key={pos}
+                    onClick={() => onChange('iconPosition', pos)}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition ${
+                      design.iconPosition === pos
+                        ? 'bg-brand-purple text-white'
+                        : 'bg-gray-100 text-brand-gray hover:bg-gray-200'
+                    }`}
+                  >
+                    {pos === 'left' ? 'Esquerda' : 'Direita'}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           <div>
             <label className="text-xs font-medium text-brand-gray">Tamanho: {design.iconSize}px</label>
             <input type="range" min={10} max={40} value={design.iconSize}

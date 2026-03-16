@@ -30,6 +30,7 @@ export default function PhotoButton({ design, isActive }) {
     width: `${design.height || 60}px`,
     height: `${design.height || 60}px`,
     padding: '8px',
+    boxShadow: design.shadow ? `0 4px 12px rgba(0,0,0,${design.shadowIntensity})` : 'none',
     transition: 'all 0.3s ease',
     ...(ANIM_STYLES[design.hoverAnimation] || {}),
   };
