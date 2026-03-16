@@ -21,6 +21,7 @@ export const DEFAULTS = {
   iconSize: 20,
   iconCustomUrl: null,
   iconColor: '#000000',
+  customButtonImage: null,
   hoverAnimation: 'none',
   badge: true,
   badgeText: 'Novidade!',

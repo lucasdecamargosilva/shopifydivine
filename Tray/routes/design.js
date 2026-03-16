@@ -36,6 +36,7 @@ const DEFAULTS = {
   iconSize: 20,
   iconCustomUrl: null,
   iconColor: '#000000',
+  customButtonImage: null,
   hoverAnimation: 'none',
   badge: true,
   badgeText: 'Novidade!',
@@ -95,6 +96,8 @@ function validateButton(btn) {
   if (btn.customCSS && btn.customCSS.length > 2000) errors.push('customCSS max 2000 chars');
   if (btn.iconCustomUrl && btn.iconCustomUrl.length > 500) errors.push('iconCustomUrl max 500 chars');
   if (btn.iconCustomUrl && !btn.iconCustomUrl.startsWith('https://')) errors.push('iconCustomUrl must start with https://');
+  if (btn.customButtonImage && typeof btn.customButtonImage === 'string' && btn.customButtonImage.length > 300000) errors.push('customButtonImage max 300KB');
+  if (btn.customButtonImage && typeof btn.customButtonImage === 'string' && !btn.customButtonImage.startsWith('data:image/')) errors.push('customButtonImage must be a data:image URI');
 
   if (btn.icon && !ENUMS.icon.includes(btn.icon)) errors.push('invalid icon value');
   if (btn.iconPosition && !ENUMS.iconPosition.includes(btn.iconPosition)) errors.push('invalid iconPosition');

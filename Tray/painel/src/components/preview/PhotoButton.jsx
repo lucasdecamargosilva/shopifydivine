@@ -11,6 +11,29 @@ const ANIM_STYLES = {
 };
 
 export default function PhotoButton({ design, isActive }) {
+  const hasCustomImage = !!design.customButtonImage;
+
+  if (hasCustomImage) {
+    return (
+      <div
+        className={`absolute bottom-4 right-4 transition-all ${isActive ? 'ring-2 ring-dashed ring-brand-purple' : ''}`}
+        style={{
+          cursor: 'pointer',
+          width: `${design.height || 60}px`,
+          height: `${design.height || 60}px`,
+          ...(ANIM_STYLES[design.hoverAnimation] || {}),
+        }}
+        title="Este botao abrira o Provador Virtual na sua loja"
+      >
+        <img
+          src={design.customButtonImage}
+          alt="Provador Virtual"
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        />
+      </div>
+    );
+  }
+
   const showIcon = design.icon !== 'none';
   const isCustomIcon = design.icon === 'custom' && design.iconCustomUrl;
 

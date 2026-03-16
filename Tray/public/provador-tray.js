@@ -153,11 +153,33 @@
         // Apply styles to PHOTO button
         var photoBtn = document.querySelector('.mc-btn-trigger-ia');
         if (photoBtn && designData.photo_button) {
-            applyDesignToElement(photoBtn, designData.photo_button, true);
-            // Apply icon color to photo button icon
-            if (designData.photo_button.iconColor) {
-                var photoIcon = photoBtn.querySelector('img');
-                if (photoIcon) applyIconColor(photoIcon, designData.photo_button.iconColor);
+            if (designData.photo_button.customButtonImage) {
+                // Custom button image replaces entire button content
+                // Safe: customButtonImage is validated server-side as data:image/ URI only
+                while (photoBtn.firstChild) photoBtn.removeChild(photoBtn.firstChild);
+                photoBtn.style.cssText = 'background:none!important;border:none!important;padding:0!important;cursor:pointer;';
+                var customImg = document.createElement('img');
+                customImg.src = designData.photo_button.customButtonImage;
+                customImg.alt = 'Provador Virtual';
+                customImg.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+                photoBtn.appendChild(customImg);
+                var sz = (designData.photo_button.height || 60) + 'px';
+                photoBtn.style.setProperty('width', sz, 'important');
+                photoBtn.style.setProperty('height', sz, 'important');
+                photoBtn.style.setProperty('filter', 'none', 'important');
+                // Apply animation
+                var anim = designData.photo_button.hoverAnimation || 'none';
+                if (anim === 'shake') photoBtn.style.animation = 'mc-shake 3s infinite';
+                else if (anim === 'scale') photoBtn.style.animation = 'mc-pulse-scale 2s ease-in-out infinite';
+                else if (anim === 'glow') photoBtn.style.animation = 'mc-glow 2s ease-in-out infinite';
+                else if (anim === 'slide') photoBtn.style.animation = 'mc-float 3s ease-in-out infinite';
+            } else {
+                applyDesignToElement(photoBtn, designData.photo_button, true);
+                // Apply icon color to photo button icon
+                if (designData.photo_button.iconColor) {
+                    var photoIcon = photoBtn.querySelector('img');
+                    if (photoIcon) applyIconColor(photoIcon, designData.photo_button.iconColor);
+                }
             }
         }
 

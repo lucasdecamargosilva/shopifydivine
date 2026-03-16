@@ -5,8 +5,8 @@ const { setupDesignRoutes } = require('./routes/design');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// JSON body parsing (50KB limit for design payloads)
-app.use(express.json({ limit: '50kb' }));
+// JSON body parsing (500KB limit for design payloads with base64 images)
+app.use(express.json({ limit: '500kb' }));
 
 // CORS - allowlist for credentialed requests
 const ALLOWED_ORIGINS = [

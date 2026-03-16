@@ -18,6 +18,20 @@ const ANIM_STYLES = {
 };
 
 function MiniPhotoButton({ design }) {
+  const hasCustomImage = !!design.customButtonImage;
+
+  if (hasCustomImage) {
+    return (
+      <div style={{
+        width: `${design.height || 60}px`,
+        height: `${design.height || 60}px`,
+        ...(ANIM_STYLES[design.hoverAnimation] || {}),
+      }}>
+        <img src={design.customButtonImage} alt="Botao" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      </div>
+    );
+  }
+
   const bgStyle = design.gradient
     ? { background: `linear-gradient(${design.gradient.direction}, ${design.gradient.colors[0]}, ${design.gradient.colors[1]})` }
     : { backgroundColor: design.backgroundColor };
