@@ -67,11 +67,20 @@ export default function BuyButton({ design, isActive }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {showIcon && isCustomIcon && (
-          <img src={design.iconCustomUrl} alt="" style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain', filter: design.iconColor && design.iconColor !== '#000000' ? `drop-shadow(0 0 0 ${design.iconColor})` : 'brightness(0) saturate(100%)' }} />
-        )}
-        {showIcon && !isCustomIcon && (
-          <img src={CABINE_IMG_URL} alt="" style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain', filter: design.iconColor && design.iconColor !== '#000000' ? `drop-shadow(0 0 0 ${design.iconColor})` : 'brightness(0) saturate(100%)' }} />
+        {showIcon && (
+          <div style={{
+            width: design.iconSize,
+            height: design.iconSize,
+            backgroundColor: design.iconColor || '#000000',
+            WebkitMaskImage: `url(${isCustomIcon ? design.iconCustomUrl : CABINE_IMG_URL})`,
+            WebkitMaskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskImage: `url(${isCustomIcon ? design.iconCustomUrl : CABINE_IMG_URL})`,
+            maskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+          }} />
         )}
         <span>{design.label}</span>
       </button>

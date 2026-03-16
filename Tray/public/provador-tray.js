@@ -61,34 +61,22 @@
 
     function applyDesignToElement(el, design) {
         if (!el || !design) return;
-        if (design.backgroundColor) el.style.backgroundColor = design.backgroundColor;
-        if (design.textColor) el.style.color = design.textColor;
-        el.style.border = (design.borderWidth || 1) + 'px solid ' + (design.borderColor || '#000000');
-        if (design.borderRadius !== undefined) el.style.borderRadius = design.borderRadius + 'px';
-        if (design.fontFamily) el.style.fontFamily = design.fontFamily;
-        if (design.fontSize) el.style.fontSize = design.fontSize + 'px';
-        if (design.fontWeight) el.style.fontWeight = design.fontWeight;
-        if (design.textTransform) el.style.textTransform = design.textTransform;
-        if (design.letterSpacing !== undefined) el.style.letterSpacing = design.letterSpacing + 'px';
-        if (design.height) el.style.height = design.height + 'px';
+        // Use setProperty with 'important' to override base !important CSS
+        if (design.backgroundColor) el.style.setProperty('background-color', design.backgroundColor, 'important');
+        if (design.textColor) el.style.setProperty('color', design.textColor, 'important');
+        el.style.setProperty('border', (design.borderWidth || 1) + 'px solid ' + (design.borderColor || '#000000'), 'important');
+        if (design.borderRadius !== undefined) el.style.setProperty('border-radius', design.borderRadius + 'px', 'important');
+        if (design.fontFamily) el.style.setProperty('font-family', design.fontFamily + ', sans-serif', 'important');
+        if (design.fontSize) el.style.setProperty('font-size', design.fontSize + 'px', 'important');
+        if (design.fontWeight) el.style.setProperty('font-weight', design.fontWeight, 'important');
+        if (design.textTransform) el.style.setProperty('text-transform', design.textTransform, 'important');
+        if (design.letterSpacing !== undefined) el.style.setProperty('letter-spacing', design.letterSpacing + 'px', 'important');
+        if (design.height) el.style.setProperty('height', design.height + 'px', 'important');
         if (design.shadow) {
-            el.style.boxShadow = '0 4px 12px rgba(0,0,0,' + (design.shadowIntensity || 0.15) + ')';
+            el.style.setProperty('box-shadow', '0 4px 12px rgba(0,0,0,' + (design.shadowIntensity || 0.15) + ')', 'important');
         }
         if (design.gradient) {
-            el.style.background = 'linear-gradient(' + design.gradient.direction + ', ' + design.gradient.colors[0] + ', ' + design.gradient.colors[1] + ')';
-        }
-        if (design.iconColor) {
-            var icons = el.querySelectorAll('img');
-            icons.forEach(function(img) {
-                img.style.filter = 'brightness(0) saturate(100%)';
-                // Apply color using CSS filter trick: brightness(0) makes black, then use drop-shadow or sepia+hue
-                var hex = design.iconColor;
-                if (hex && hex !== '#000000') {
-                    // Convert hex to hue-rotate approach
-                    img.style.filter = 'none';
-                    img.style.cssText += ';filter: drop-shadow(0 0 0 ' + hex + ');-webkit-filter: drop-shadow(0 0 0 ' + hex + ');';
-                }
-            });
+            el.style.setProperty('background', 'linear-gradient(' + design.gradient.direction + ', ' + design.gradient.colors[0] + ', ' + design.gradient.colors[1] + ')', 'important');
         }
         if (design.hoverAnimation === 'shake') {
             el.style.animation = 'mc-shake 3s infinite';
@@ -99,6 +87,24 @@
         }
         if (design.customCSS) {
             el.style.cssText += ';' + design.customCSS;
+        }
+    }
+
+    function applyIconColor(img, hex) {
+        if (!img || !hex) return;
+        // Replace img with a colored div using CSS mask
+        var wrapper = document.createElement('div');
+        var w = img.style.width || img.getAttribute('width') || '20px';
+        var h = img.style.height || img.getAttribute('height') || '20px';
+        wrapper.style.cssText = 'display:inline-block;width:' + w + ';height:' + h +
+            ';background-color:' + hex +
+            ';-webkit-mask-image:url(' + img.src + ')' +
+            ';-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center' +
+            ';mask-image:url(' + img.src + ')' +
+            ';mask-size:contain;mask-repeat:no-repeat;mask-position:center;';
+        wrapper.className = 'pl-icon-colored';
+        if (img.parentNode) {
+            img.parentNode.replaceChild(wrapper, img);
         }
     }
 
@@ -124,14 +130,7 @@
             // Apply icon color to buy button icon
             if (designData.buy_button.iconColor) {
                 var buyIcon = buyBtn.querySelector('img');
-                if (buyIcon) {
-                    var hex = designData.buy_button.iconColor;
-                    if (hex && hex !== '#000000') {
-                        buyIcon.style.cssText += ';filter: drop-shadow(0 0 0 ' + hex + ');-webkit-filter: drop-shadow(0 0 0 ' + hex + ');';
-                    } else {
-                        buyIcon.style.filter = 'brightness(0) saturate(100%)';
-                    }
-                }
+                if (buyIcon) applyIconColor(buyIcon, designData.buy_button.iconColor);
             }
         }
 
@@ -142,14 +141,7 @@
             // Apply icon color to photo button icon
             if (designData.photo_button.iconColor) {
                 var photoIcon = photoBtn.querySelector('img');
-                if (photoIcon) {
-                    var hex = designData.photo_button.iconColor;
-                    if (hex && hex !== '#000000') {
-                        photoIcon.style.cssText += ';filter: drop-shadow(0 0 0 ' + hex + ');-webkit-filter: drop-shadow(0 0 0 ' + hex + ');';
-                    } else {
-                        photoIcon.style.filter = 'brightness(0) saturate(100%)';
-                    }
-                }
+                if (photoIcon) applyIconColor(photoIcon, designData.photo_button.iconColor);
             }
         }
 
