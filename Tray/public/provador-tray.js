@@ -1181,7 +1181,10 @@
             path.includes('/p/') ||
             path.includes('/products/') ||
             document.getElementById('product-container') !== null ||
-            document.getElementById('form_comprar') !== null;
+            document.getElementById('form_comprar') !== null ||
+            document.querySelector('.botao-comprar') !== null ||
+            document.querySelector('#menuVars') !== null ||
+            document.querySelector('.product-colum-right') !== null;
 
         LOG.info('Página atual: "' + path + '"  →  é página de produto: ' + isProductPage);
 
