@@ -20,6 +20,7 @@ export const DEFAULTS = {
   iconPosition: 'left',
   iconSize: 20,
   iconCustomUrl: null,
+  iconColor: '#000000',
   hoverAnimation: 'invert',
   badge: true,
   badgeText: 'Novidade!',
@@ -45,5 +46,6 @@ export const ANIMATION_OPTIONS = [
   { value: 'scale', label: 'Aumentar' },
   { value: 'glow', label: 'Brilho' },
   { value: 'slide', label: 'Deslizar' },
+  { value: 'shake', label: 'Balancar' },
   { value: 'none', label: 'Nenhuma' }
 ];

@@ -52,6 +52,18 @@ export default function IconControl({ design, onChange }) {
               onChange={e => onChange('iconSize', Number(e.target.value))}
               className="w-full accent-brand-purple" />
           </div>
+          <div>
+            <label className="text-xs font-medium text-brand-gray">Cor do icone</label>
+            <div className="flex items-center gap-2 mt-1">
+              <input
+                type="color"
+                value={design.iconColor || '#000000'}
+                onChange={e => onChange('iconColor', e.target.value)}
+                className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+              />
+              <span className="text-xs text-brand-gray">{design.iconColor || '#000000'}</span>
+            </div>
+          </div>
         </>
       )}
     </div>

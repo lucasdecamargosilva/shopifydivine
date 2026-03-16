@@ -7,6 +7,7 @@ const HOVER_STYLES = {
   scale: { transform: 'scale(1.05)' },
   glow: { boxShadow: '0 0 20px rgba(123,47,242,0.5)' },
   slide: { transform: 'translateY(-2px)' },
+  shake: { animation: 'mc-shake 0.5s ease-in-out' },
   none: {}
 };
 
@@ -67,10 +68,10 @@ export default function BuyButton({ design, isActive }) {
         onMouseLeave={() => setHovered(false)}
       >
         {showIcon && isCustomIcon && (
-          <img src={design.iconCustomUrl} alt="" style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain' }} />
+          <img src={design.iconCustomUrl} alt="" style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain', filter: design.iconColor && design.iconColor !== '#000000' ? `drop-shadow(0 0 0 ${design.iconColor})` : 'brightness(0) saturate(100%)' }} />
         )}
         {showIcon && !isCustomIcon && (
-          <img src={CABINE_IMG_URL} alt="" style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain' }} />
+          <img src={CABINE_IMG_URL} alt="" style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain', filter: design.iconColor && design.iconColor !== '#000000' ? `drop-shadow(0 0 0 ${design.iconColor})` : 'brightness(0) saturate(100%)' }} />
         )}
         <span>{design.label}</span>
       </button>

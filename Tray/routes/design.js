@@ -35,6 +35,7 @@ const DEFAULTS = {
   iconPosition: 'left',
   iconSize: 20,
   iconCustomUrl: null,
+  iconColor: '#000000',
   hoverAnimation: 'invert',
   badge: true,
   badgeText: 'Novidade!',
@@ -44,7 +45,7 @@ const DEFAULTS = {
 const ENUMS = {
   icon: ['cabine', 'cabide', 'espelho', 'provador', 'custom', 'none'],
   iconPosition: ['left', 'right'],
-  hoverAnimation: ['invert', 'scale', 'glow', 'slide', 'none'],
+  hoverAnimation: ['invert', 'scale', 'glow', 'slide', 'shake', 'none'],
   textTransform: ['uppercase', 'lowercase', 'capitalize', 'none'],
   fontWeight: [400, 500, 600, 700, 800],
   fontFamily: ['Inter', 'Roboto', 'Poppins', 'Montserrat', 'Open Sans', 'Lato', 'Playfair Display', 'Raleway'],

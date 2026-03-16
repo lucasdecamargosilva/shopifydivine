@@ -77,8 +77,89 @@
         if (design.gradient) {
             el.style.background = 'linear-gradient(' + design.gradient.direction + ', ' + design.gradient.colors[0] + ', ' + design.gradient.colors[1] + ')';
         }
+        if (design.iconColor) {
+            var icons = el.querySelectorAll('img');
+            icons.forEach(function(img) {
+                img.style.filter = 'brightness(0) saturate(100%)';
+                // Apply color using CSS filter trick: brightness(0) makes black, then use drop-shadow or sepia+hue
+                var hex = design.iconColor;
+                if (hex && hex !== '#000000') {
+                    // Convert hex to hue-rotate approach
+                    img.style.filter = 'none';
+                    img.style.cssText += ';filter: drop-shadow(0 0 0 ' + hex + ');-webkit-filter: drop-shadow(0 0 0 ' + hex + ');';
+                }
+            });
+        }
+        if (design.hoverAnimation === 'shake') {
+            el.style.animation = 'mc-shake 3s infinite';
+            el.classList.add('mc-anim-shake');
+        } else {
+            el.style.animation = 'none';
+            el.classList.remove('mc-anim-shake');
+        }
         if (design.customCSS) {
             el.style.cssText += ';' + design.customCSS;
+        }
+    }
+
+    function applyDesignToButtons() {
+        if (!_fetchedDesign) return;
+        var designData = _fetchedDesign;
+
+        // Apply styles to BUY button
+        var buyBtn = document.querySelector('.pl-btn-provador-buy');
+        if (buyBtn && designData.buy_button) {
+            applyDesignToElement(buyBtn, designData.buy_button);
+            var textNode = buyBtn.lastChild;
+            if (textNode && textNode.nodeType === 3 && designData.buy_button.label) {
+                textNode.textContent = designData.buy_button.label;
+            }
+            var badge = document.querySelector('.pl-badge-novidade');
+            if (badge && designData.buy_button.badgeText) {
+                badge.textContent = designData.buy_button.badgeText;
+            }
+            if (badge && designData.buy_button.badge === false) {
+                badge.style.display = 'none';
+            }
+            // Apply icon color to buy button icon
+            if (designData.buy_button.iconColor) {
+                var buyIcon = buyBtn.querySelector('img');
+                if (buyIcon) {
+                    var hex = designData.buy_button.iconColor;
+                    if (hex && hex !== '#000000') {
+                        buyIcon.style.cssText += ';filter: drop-shadow(0 0 0 ' + hex + ');-webkit-filter: drop-shadow(0 0 0 ' + hex + ');';
+                    } else {
+                        buyIcon.style.filter = 'brightness(0) saturate(100%)';
+                    }
+                }
+            }
+        }
+
+        // Apply styles to PHOTO button
+        var photoBtn = document.querySelector('.mc-btn-trigger-ia');
+        if (photoBtn && designData.photo_button) {
+            applyDesignToElement(photoBtn, designData.photo_button);
+            // Apply icon color to photo button icon
+            if (designData.photo_button.iconColor) {
+                var photoIcon = photoBtn.querySelector('img');
+                if (photoIcon) {
+                    var hex = designData.photo_button.iconColor;
+                    if (hex && hex !== '#000000') {
+                        photoIcon.style.cssText += ';filter: drop-shadow(0 0 0 ' + hex + ');-webkit-filter: drop-shadow(0 0 0 ' + hex + ');';
+                    } else {
+                        photoIcon.style.filter = 'brightness(0) saturate(100%)';
+                    }
+                }
+            }
+        }
+
+        // Hide/show buttons based on button_mode
+        if (BUTTON_MODE === 'image') {
+            var buyContainer = document.querySelector('.pl-buy-btn-container');
+            if (buyContainer) buyContainer.style.display = 'none';
+        } else if (BUTTON_MODE === 'buy') {
+            var photoEl = document.querySelector('.mc-btn-trigger-ia');
+            if (photoEl) photoEl.style.display = 'none';
         }
     }
 
@@ -98,45 +179,15 @@
             .catch(function() { return null; });
     }
 
-    // Fetch and apply design after DOM is ready
+    // Fetch design data (buttons are applied later in init() after DOM elements exist)
     fetchDesignFromAPI().then(function(designData) {
         if (!designData) return;
         _fetchedDesign = designData;
         if (designData.button_mode) {
             BUTTON_MODE = designData.button_mode;
         }
-
-        // Apply styles to BUY button
-        var buyBtn = document.querySelector('.pl-btn-provador-buy');
-        if (buyBtn && designData.buy_button) {
-            applyDesignToElement(buyBtn, designData.buy_button);
-            var textNode = buyBtn.lastChild;
-            if (textNode && textNode.nodeType === 3 && designData.buy_button.label) {
-                textNode.textContent = designData.buy_button.label;
-            }
-            var badge = document.querySelector('.pl-badge-novidade');
-            if (badge && designData.buy_button.badgeText) {
-                badge.textContent = designData.buy_button.badgeText;
-            }
-            if (badge && designData.buy_button.badge === false) {
-                badge.style.display = 'none';
-            }
-        }
-
-        // Apply styles to PHOTO button
-        var photoBtn = document.querySelector('.mc-btn-trigger-ia');
-        if (photoBtn && designData.photo_button) {
-            applyDesignToElement(photoBtn, designData.photo_button);
-        }
-
-        // Hide/show buttons based on button_mode
-        if (BUTTON_MODE === 'image') {
-            var buyContainer = document.querySelector('.pl-buy-btn-container');
-            if (buyContainer) buyContainer.style.display = 'none';
-        } else if (BUTTON_MODE === 'buy') {
-            var photoEl = document.querySelector('.mc-btn-trigger-ia');
-            if (photoEl) photoEl.style.display = 'none';
-        }
+        // If init() already ran, apply now
+        applyDesignToButtons();
     });
 
     // ─── TABELAS DE TAMANHOS ──────────────────────────────────────────────────────
@@ -295,12 +346,13 @@
             justify-content: center;
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
             transition: transform 0.2s ease, filter 0.2s ease;
-            animation: mc-shake 3s infinite;
         }
-        .mc-btn-trigger-ia:hover { 
+        .mc-btn-trigger-ia:hover {
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.28));
-            animation-play-state: paused;
             transform: scale(1.1) !important;
+        }
+        .mc-btn-trigger-ia.mc-anim-shake:hover {
+            animation-play-state: paused;
         }
         .mc-btn-trigger-ia img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -1094,6 +1146,9 @@
         // Funcionalidade de adicionar ao carrinho removida conforme solicitado
 
 
+
+        // Apply design after buttons exist in DOM
+        applyDesignToButtons();
 
         LOG.ok('Provador inicializado com sucesso!');
     }
