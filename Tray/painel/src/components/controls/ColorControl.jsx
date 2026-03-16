@@ -28,7 +28,7 @@ function ColorField({ label, value, onChange }) {
   );
 }
 
-export default function ColorControl({ design, onChange }) {
+export default function ColorControl({ design, onChange, activeButton }) {
   const hasGradient = !!design.gradient;
 
   return (
@@ -57,7 +57,9 @@ export default function ColorControl({ design, onChange }) {
       ) : (
         <ColorField label="Cor de fundo" value={design.backgroundColor} onChange={v => onChange('backgroundColor', v)} />
       )}
-      <ColorField label="Cor do texto" value={design.textColor} onChange={v => onChange('textColor', v)} />
+      {activeButton === 'buy_button' && (
+        <ColorField label="Cor do texto" value={design.textColor} onChange={v => onChange('textColor', v)} />
+      )}
       <ColorField label="Cor da borda" value={design.borderColor} onChange={v => onChange('borderColor', v)} />
     </div>
   );

@@ -59,22 +59,31 @@
         document.head.appendChild(link);
     }
 
-    function applyDesignToElement(el, design) {
+    function applyDesignToElement(el, design, isPhotoButton) {
         if (!el || !design) return;
         // Use setProperty with 'important' to override base !important CSS
         if (design.backgroundColor) el.style.setProperty('background-color', design.backgroundColor, 'important');
         if (design.textColor) el.style.setProperty('color', design.textColor, 'important');
-        el.style.setProperty('border', (design.borderWidth || 1) + 'px solid ' + (design.borderColor || '#000000'), 'important');
+        var bw = design.borderWidth !== undefined ? design.borderWidth : 1;
+        el.style.setProperty('border', bw + 'px solid ' + (design.borderColor || '#000000'), 'important');
         if (design.borderRadius !== undefined) el.style.setProperty('border-radius', design.borderRadius + 'px', 'important');
         if (design.fontFamily) el.style.setProperty('font-family', design.fontFamily + ', sans-serif', 'important');
         if (design.fontSize) el.style.setProperty('font-size', design.fontSize + 'px', 'important');
         if (design.fontWeight) el.style.setProperty('font-weight', design.fontWeight, 'important');
         if (design.textTransform) el.style.setProperty('text-transform', design.textTransform, 'important');
         if (design.letterSpacing !== undefined) el.style.setProperty('letter-spacing', design.letterSpacing + 'px', 'important');
-        if (design.height) el.style.setProperty('height', design.height + 'px', 'important');
+        if (design.height !== undefined) {
+            el.style.setProperty('height', design.height + 'px', 'important');
+            // Photo button is square — width matches height
+            if (isPhotoButton) el.style.setProperty('width', design.height + 'px', 'important');
+        }
         if (design.shadow) {
             el.style.setProperty('box-shadow', '0 4px 12px rgba(0,0,0,' + (design.shadowIntensity || 0.15) + ')', 'important');
+        } else {
+            el.style.setProperty('box-shadow', 'none', 'important');
         }
+        // Remove drop-shadow filter from photo button when custom design is applied
+        if (isPhotoButton) el.style.setProperty('filter', 'none', 'important');
         if (design.gradient) {
             el.style.setProperty('background', 'linear-gradient(' + design.gradient.direction + ', ' + design.gradient.colors[0] + ', ' + design.gradient.colors[1] + ')', 'important');
         }
@@ -122,7 +131,7 @@
         // Apply styles to BUY button
         var buyBtn = document.querySelector('.pl-btn-provador-buy');
         if (buyBtn && designData.buy_button) {
-            applyDesignToElement(buyBtn, designData.buy_button);
+            applyDesignToElement(buyBtn, designData.buy_button, false);
             var textNode = buyBtn.lastChild;
             if (textNode && textNode.nodeType === 3 && designData.buy_button.label) {
                 textNode.textContent = designData.buy_button.label;
@@ -144,7 +153,7 @@
         // Apply styles to PHOTO button
         var photoBtn = document.querySelector('.mc-btn-trigger-ia');
         if (photoBtn && designData.photo_button) {
-            applyDesignToElement(photoBtn, designData.photo_button);
+            applyDesignToElement(photoBtn, designData.photo_button, true);
             // Apply icon color to photo button icon
             if (designData.photo_button.iconColor) {
                 var photoIcon = photoBtn.querySelector('img');
