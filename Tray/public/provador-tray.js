@@ -782,6 +782,9 @@
 
         function placeBuyButton() {
             var trayBuySelectors = [
+                '.product-buy-button',
+                '.wrapper-btn-buy',
+                '.button-buy',
                 '.buy-button',
                 '#buy-button',
                 '.botao-comprar',
@@ -811,6 +814,10 @@
         }
 
         var trayImgContainers = [
+            '.produto-imagem',
+            '.product-image',
+            '.product-images',
+            '.product-gallery',
             '.image-show',
             '.box-gallery',
             '.product-colum-left',
@@ -1196,7 +1203,11 @@
             document.getElementById('form_comprar') !== null ||
             document.querySelector('.botao-comprar') !== null ||
             document.querySelector('#menuVars') !== null ||
-            document.querySelector('.product-colum-right') !== null;
+            document.querySelector('.product-colum-right') !== null ||
+            document.querySelector('.page-product') !== null ||
+            document.querySelector('.product-buy-button') !== null ||
+            document.querySelector('.button-buy') !== null ||
+            document.querySelector('.product-name') !== null;
 
         LOG.info('Página atual: "' + path + '"  →  é página de produto: ' + isProductPage);
 
@@ -1211,7 +1222,11 @@
                     document.querySelector('.botao-comprar') !== null ||
                     document.getElementById('form_comprar') !== null ||
                     document.querySelector('#menuVars') !== null ||
-                    document.querySelector('.product-colum-right') !== null;
+                    document.querySelector('.product-colum-right') !== null ||
+                    document.querySelector('.page-product') !== null ||
+                    document.querySelector('.product-buy-button') !== null ||
+                    document.querySelector('.button-buy') !== null ||
+                    document.querySelector('.product-name') !== null;
                 if (found) {
                     clearInterval(detectInterval);
                     LOG.ok('Página de produto detectada apos ' + detectRetry + ' tentativa(s)');
