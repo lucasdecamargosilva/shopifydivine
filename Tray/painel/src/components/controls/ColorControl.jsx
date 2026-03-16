@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
 function ColorField({ label, value, onChange }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
   return (
-    <div className="mb-3">
+    <div className="mb-3" ref={ref}>
       <label className="text-xs font-medium text-brand-gray">{label}</label>
       <div className="flex items-center gap-2 mt-1">
         <button
