@@ -31,11 +31,19 @@ function MiniPhotoButton({ design }) {
       boxShadow: design.shadow ? `0 4px 12px rgba(0,0,0,${design.shadowIntensity})` : 'none',
     }}>
       {showIcon && (
-        <img
-          src={isCustomIcon ? design.iconCustomUrl : CABINE_IMG_URL}
-          alt=""
-          style={{ width: design.iconSize, height: design.iconSize, objectFit: 'contain' }}
-        />
+        <div style={{
+          width: design.iconSize,
+          height: design.iconSize,
+          backgroundColor: design.iconColor || '#000000',
+          WebkitMaskImage: `url(${isCustomIcon ? design.iconCustomUrl : CABINE_IMG_URL})`,
+          WebkitMaskSize: 'contain',
+          WebkitMaskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskImage: `url(${isCustomIcon ? design.iconCustomUrl : CABINE_IMG_URL})`,
+          maskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          maskPosition: 'center',
+        }} />
       )}
     </div>
   );
@@ -127,7 +135,7 @@ export default function EditorPanel({ design, activeButton, onChangeButton, onCh
             </button>
             {openSection === id && (
               <div className="px-4 pb-4">
-                <Component design={buttonDesign} onChange={handleChange} />
+                <Component design={buttonDesign} onChange={handleChange} activeButton={activeButton} />
               </div>
             )}
           </div>

@@ -78,12 +78,19 @@
         if (design.gradient) {
             el.style.setProperty('background', 'linear-gradient(' + design.gradient.direction + ', ' + design.gradient.colors[0] + ', ' + design.gradient.colors[1] + ')', 'important');
         }
-        if (design.hoverAnimation === 'shake') {
+        // Continuous animation effects (not hover-based)
+        var anim = design.hoverAnimation || 'none';
+        el.classList.remove('mc-anim-shake', 'mc-anim-scale', 'mc-anim-glow', 'mc-anim-slide');
+        el.style.animation = '';
+        if (anim === 'shake') {
             el.style.animation = 'mc-shake 3s infinite';
             el.classList.add('mc-anim-shake');
-        } else {
-            el.style.animation = 'none';
-            el.classList.remove('mc-anim-shake');
+        } else if (anim === 'scale') {
+            el.style.animation = 'mc-pulse-scale 2s ease-in-out infinite';
+        } else if (anim === 'glow') {
+            el.style.animation = 'mc-glow 2s ease-in-out infinite';
+        } else if (anim === 'slide') {
+            el.style.animation = 'mc-float 3s ease-in-out infinite';
         }
         if (design.customCSS) {
             el.style.cssText += ';' + design.customCSS;
@@ -341,10 +348,6 @@
         }
         .mc-btn-trigger-ia:hover {
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.28));
-            transform: scale(1.1) !important;
-        }
-        .mc-btn-trigger-ia.mc-anim-shake:hover {
-            animation-play-state: paused;
         }
         .mc-btn-trigger-ia img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -509,6 +512,18 @@
             40% { transform: rotate(10deg); }
             50% { transform: rotate(0deg); }
             100% { transform: rotate(0deg); }
+        }
+        @keyframes mc-pulse-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        @keyframes mc-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(123,47,242,0.2); }
+            50% { box-shadow: 0 0 20px rgba(123,47,242,0.6); }
+        }
+        @keyframes mc-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
         @keyframes mc-slide { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
         @keyframes mc-pulse-text { 0%, 100% { opacity: 0.4; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }

@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const CABINE_IMG_URL = 'https://i.ibb.co/50TPgYj/cabine-icone-oficial.png';
 
-const HOVER_STYLES = {
-  invert: { filter: 'invert(1)' },
-  scale: { transform: 'scale(1.05)' },
-  glow: { boxShadow: '0 0 20px rgba(123,47,242,0.5)' },
-  slide: { transform: 'translateY(-2px)' },
-  shake: { animation: 'mc-shake 0.5s ease-in-out' },
+const ANIM_STYLES = {
+  scale: { animation: 'mc-pulse-scale 2s ease-in-out infinite' },
+  glow: { animation: 'mc-glow 2s ease-in-out infinite' },
+  slide: { animation: 'mc-float 3s ease-in-out infinite' },
+  shake: { animation: 'mc-shake 3s infinite' },
   none: {}
 };
 
 export default function BuyButton({ design, isActive }) {
-  const [hovered, setHovered] = useState(false);
   const showIcon = design.icon !== 'none';
   const isCustomIcon = design.icon === 'custom' && design.iconCustomUrl;
 
@@ -40,7 +38,7 @@ export default function BuyButton({ design, isActive }) {
     width: '100%',
     flexDirection: design.iconPosition === 'right' ? 'row-reverse' : 'row',
     transition: 'all 0.3s ease',
-    ...(hovered ? HOVER_STYLES[design.hoverAnimation] || {} : {}),
+    ...(ANIM_STYLES[design.hoverAnimation] || {}),
   };
 
   return (
@@ -64,8 +62,6 @@ export default function BuyButton({ design, isActive }) {
         className={`transition-all ${isActive ? 'ring-2 ring-dashed ring-brand-purple ring-offset-2' : ''}`}
         style={style}
         title="Este botao abrira o Provador Virtual na sua loja"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
       >
         {showIcon && (
           <div style={{

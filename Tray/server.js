@@ -35,12 +35,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Static: provador-tray.js (1h cache)
+// Static: provador-tray.js (no-cache so stores always get latest version)
 app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: '1h',
+  maxAge: 0,
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
     }
   }
 }));

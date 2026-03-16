@@ -21,7 +21,7 @@ export const DEFAULTS = {
   iconSize: 20,
   iconCustomUrl: null,
   iconColor: '#000000',
-  hoverAnimation: 'invert',
+  hoverAnimation: 'none',
   badge: true,
   badgeText: 'Novidade!',
   customCSS: ''
@@ -42,10 +42,9 @@ export const ICON_OPTIONS = [
 ];
 
 export const ANIMATION_OPTIONS = [
-  { value: 'invert', label: 'Inverter cores' },
-  { value: 'scale', label: 'Aumentar' },
+  { value: 'scale', label: 'Pulsar' },
   { value: 'glow', label: 'Brilho' },
-  { value: 'slide', label: 'Deslizar' },
+  { value: 'slide', label: 'Flutuar' },
   { value: 'shake', label: 'Balancar' },
   { value: 'none', label: 'Nenhuma' }
 ];
