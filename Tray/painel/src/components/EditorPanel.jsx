@@ -81,7 +81,7 @@ const SECTIONS = [
   { id: 'advanced', label: 'Avancado', icon: '\u{2699}\u{FE0F}', Component: AdvancedControl },
 ];
 
-export default function EditorPanel({ design, activeButton, onChangeButton, onChangeMode, onChange }) {
+export default function EditorPanel({ design, activeButton, onChangeButton, onChange }) {
   const [openSection, setOpenSection] = useState('colors');
   const buttonDesign = design[activeButton];
 
@@ -117,30 +117,6 @@ export default function EditorPanel({ design, activeButton, onChangeButton, onCh
           ) : (
             <MiniPhotoButton design={buttonDesign} />
           )}
-        </div>
-      </div>
-
-      {/* Button mode toggle */}
-      <div className="p-4 border-b border-gray-200 bg-white">
-        <label className="text-xs font-semibold text-brand-dark uppercase tracking-wide">Onde exibir?</label>
-        <div className="flex gap-2 mt-2">
-          {[
-            { value: 'image', label: 'Foto' },
-            { value: 'buy', label: 'Compra' },
-            { value: 'both', label: 'Ambos' }
-          ].map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => onChangeMode(opt.value)}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition ${
-                design.button_mode === opt.value
-                  ? 'bg-brand-purple text-white'
-                  : 'bg-gray-100 text-brand-gray hover:bg-gray-200'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
         </div>
       </div>
 

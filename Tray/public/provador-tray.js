@@ -157,7 +157,12 @@
                 // Custom button image replaces entire button content
                 // Safe: customButtonImage is validated server-side as data:image/ URI only
                 while (photoBtn.firstChild) photoBtn.removeChild(photoBtn.firstChild);
-                photoBtn.style.cssText = 'background:none!important;border:none!important;padding:0!important;cursor:pointer;';
+                // Preserve position-related inline styles (position:fixed, top, left, z-index)
+                // Only reset visual styles — do NOT use cssText= which wipes everything
+                photoBtn.style.setProperty('background', 'none', 'important');
+                photoBtn.style.setProperty('border', 'none', 'important');
+                photoBtn.style.setProperty('padding', '0', 'important');
+                photoBtn.style.setProperty('cursor', 'pointer');
                 var customImg = document.createElement('img');
                 customImg.src = designData.photo_button.customButtonImage;
                 customImg.alt = 'Provador Virtual';
@@ -868,6 +873,9 @@
 
                     (function(targetEl, mobile) {
                         function positionBtn() {
+                            // Always re-assert position:fixed (applyDesignToButtons may alter styles)
+                            openBtn.style.position = 'fixed';
+                            openBtn.style.zIndex = '50';
                             var rect = targetEl.getBoundingClientRect();
                             var btnTop = rect.top + (mobile ? 70 : 15);
                             var threshold = mobile ? 80 : 120;
