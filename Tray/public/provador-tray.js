@@ -163,8 +163,7 @@
                 photoBtn.style.setProperty('border', 'none', 'important');
                 photoBtn.style.setProperty('padding', '0', 'important');
                 photoBtn.style.setProperty('cursor', 'pointer');
-                // Re-assert positioning (may have been lost if design applied before init)
-                photoBtn.style.setProperty('position', 'fixed', 'important');
+                // Re-assert display (visual styles only — position comes from container placement)
                 photoBtn.style.setProperty('display', 'flex', 'important');
                 photoBtn.style.setProperty('align-items', 'center', 'important');
                 photoBtn.style.setProperty('justify-content', 'center', 'important');
@@ -203,8 +202,6 @@
             if (photoEl) photoEl.style.display = 'none';
         }
 
-        // Re-trigger position handler after style changes
-        window.dispatchEvent(new Event('scroll'));
     }
 
     function fetchDesignFromAPI() {
@@ -376,7 +373,7 @@
         }
         .mc-btn-trigger-ia {
             position: absolute;
-            top: 60px;
+            top: 15px;
             left: 15px;
             z-index: 10;
             background: none;
@@ -865,44 +862,32 @@
         ];
 
         // ── Posicionar selo na foto (mode: 'image' ou 'both') ──
+        // Strategy: place button INSIDE the image container with position:absolute
+        // so it scrolls naturally with the product image (no scroll handler needed).
         var placedImage = false;
         if (BUTTON_MODE === 'image' || BUTTON_MODE === 'both') {
-            for (var si = 0; si < trayImgContainers.concat(fallbackContainers).length; si++) {
-                var sel = trayImgContainers.concat(fallbackContainers)[si];
+            var allImgSelectors = trayImgContainers.concat(fallbackContainers);
+            for (var si = 0; si < allImgSelectors.length; si++) {
+                var sel = allImgSelectors[si];
                 var el = document.querySelector(sel);
                 if (el) {
-                    var isMobile = window.innerWidth < 768;
-                    var btnSize = isMobile ? '80px' : '60px';
+                    // Ensure parent is a positioning context
+                    var computedPos = window.getComputedStyle(el).position;
+                    if (computedPos === 'static') {
+                        el.style.position = 'relative';
+                    }
 
-                    document.body.appendChild(openBtn);
-                    openBtn.style.position = 'fixed';
-                    openBtn.style.zIndex = '50';
-                    openBtn.style.width = btnSize;
-                    openBtn.style.height = btnSize;
-
-                    (function(targetEl, mobile) {
-                        function positionBtn() {
-                            // Always re-assert position:fixed (applyDesignToButtons may alter styles)
-                            openBtn.style.position = 'fixed';
-                            openBtn.style.zIndex = '50';
-                            var rect = targetEl.getBoundingClientRect();
-                            var btnTop = rect.top + (mobile ? 70 : 15);
-                            var threshold = mobile ? 80 : 120;
-                            if (btnTop < threshold || rect.bottom < 0) {
-                                openBtn.style.visibility = 'hidden';
-                            } else {
-                                openBtn.style.visibility = 'visible';
-                                openBtn.style.top = btnTop + 'px';
-                                openBtn.style.left = (rect.right - (mobile ? 100 : 180)) + 'px';
-                            }
-                        }
-                        positionBtn();
-                        window.addEventListener('scroll', positionBtn);
-                        window.addEventListener('resize', positionBtn);
-                    })(el, isMobile);
+                    // Place button inside the image container
+                    el.appendChild(openBtn);
+                    openBtn.style.position = 'absolute';
+                    openBtn.style.top = '15px';
+                    openBtn.style.left = '15px';
+                    openBtn.style.zIndex = '10';
+                    openBtn.style.width = '60px';
+                    openBtn.style.height = '60px';
 
                     placedImage = true;
-                    LOG.ok('Selo posicionado (' + (isMobile ? 'mobile' : 'desktop') + ') sobre: "' + sel + '"');
+                    LOG.ok('Selo posicionado dentro de: "' + sel + '"');
                     break;
                 }
             }
