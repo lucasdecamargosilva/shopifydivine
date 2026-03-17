@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import EditorPanel from './components/EditorPanel';
 import PreviewPanel from './components/PreviewPanel';
-import { fetchDesign, saveDesign, fetchDefaults } from './api';
+import { fetchDesign, saveDesign, uploadButtonImage, deleteButtonImage, fetchDefaults } from './api';
 import { DEFAULTS } from './defaults';
 
 function getParams() {
@@ -102,6 +102,16 @@ export default function App() {
     }
     setSaving(true);
     try {
+      // 1) Upload custom image separately (if present)
+      const photoImg = design.photo_button.customButtonImage;
+      if (photoImg && photoImg.startsWith('data:image/')) {
+        await uploadButtonImage(storeId, token, photoImg);
+      } else if (!photoImg) {
+        // Image was removed — delete from server
+        await deleteButtonImage(storeId, token).catch(() => {});
+      }
+
+      // 2) Save design (without base64 — stripped in api.js)
       await saveDesign(storeId, token, design);
       setSavedDesign({ ...design });
       setToast({ type: 'success', message: 'Design salvo! As mudancas ja estao ativas na sua loja.' });

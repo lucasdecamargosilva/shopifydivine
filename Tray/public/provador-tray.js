@@ -177,6 +177,11 @@
                 photoBtn.style.setProperty('height', sz, 'important');
                 photoBtn.style.setProperty('filter', 'none', 'important');
                 photoBtn.style.setProperty('box-shadow', 'none', 'important');
+                // Re-assert position so store CSS cannot override it
+                photoBtn.style.setProperty('position', 'absolute', 'important');
+                photoBtn.style.setProperty('top', '15px', 'important');
+                photoBtn.style.setProperty('left', '15px', 'important');
+                photoBtn.style.setProperty('z-index', '10', 'important');
                 // Apply animation
                 var anim = designData.photo_button.hoverAnimation || 'none';
                 if (anim === 'shake') photoBtn.style.animation = 'mc-shake 3s infinite';
@@ -185,6 +190,11 @@
                 else if (anim === 'slide') photoBtn.style.animation = 'mc-float 3s ease-in-out infinite';
             } else {
                 applyDesignToElement(photoBtn, designData.photo_button, true);
+                // Re-assert position after applyDesignToElement (customCSS could overwrite)
+                photoBtn.style.setProperty('position', 'absolute', 'important');
+                photoBtn.style.setProperty('top', '15px', 'important');
+                photoBtn.style.setProperty('left', '15px', 'important');
+                photoBtn.style.setProperty('z-index', '10', 'important');
                 // Apply icon color to photo button icon
                 if (designData.photo_button.iconColor) {
                     var photoIcon = photoBtn.querySelector('img');
@@ -879,12 +889,12 @@
 
                     // Place button inside the image container
                     el.appendChild(openBtn);
-                    openBtn.style.position = 'absolute';
-                    openBtn.style.top = '15px';
-                    openBtn.style.left = '15px';
-                    openBtn.style.zIndex = '10';
-                    openBtn.style.width = '60px';
-                    openBtn.style.height = '60px';
+                    openBtn.style.setProperty('position', 'absolute', 'important');
+                    openBtn.style.setProperty('top', '15px', 'important');
+                    openBtn.style.setProperty('left', '15px', 'important');
+                    openBtn.style.setProperty('z-index', '10', 'important');
+                    openBtn.style.setProperty('width', '60px', 'important');
+                    openBtn.style.setProperty('height', '60px', 'important');
 
                     placedImage = true;
                     LOG.ok('Selo posicionado dentro de: "' + sel + '"');

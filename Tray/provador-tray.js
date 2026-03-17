@@ -13,14 +13,131 @@
     // 0. LER API KEY DA URL DO SCRIPT
     // ===============================================
     const _selfScript = document.querySelector('script[src*="provador-tray"]');
-    const apiKey = _selfScript ? new URL(_selfScript.src).searchParams.get('key') : '';
+    const _scriptUrl = _selfScript ? new URL(_selfScript.src) : null;
+    const apiKey = _scriptUrl ? _scriptUrl.searchParams.get('key') : '';
     if (!apiKey) { console.error('[Provou Levou] API key nao encontrada na URL do script'); return; }
     window.PROVOU_LEVOU_API_KEY = apiKey;
+
+    // mode: 'image' (só na foto), 'buy' (só acima do comprar), 'both' (ambos)
+    let BUTTON_MODE = (_scriptUrl ? _scriptUrl.searchParams.get('mode') : null) || 'both';
+
+    const STORE_ID = _scriptUrl ? _scriptUrl.searchParams.get('store_id') : '';
+    const API_HOST = _scriptUrl ? _scriptUrl.origin : '';
 
     const WEBHOOK_PROVA = 'https://n8n.segredosdodrop.com/webhook/quantic-materialize';
     const LOGO_URL = 'https://provoulevou.com.br/assets/provoulevou-logo.png';
 
     LOG.info('Script carregado — Provador Virtual Provou Levou (Tray)');
+
+    // ─── DESIGN FETCH (API) ─────────────────────────────────────────────────────
+    var _fetchedDesign = null;
+    var CACHE_KEY = 'pl_design_' + STORE_ID;
+    var CACHE_TTL = 5 * 60 * 1000;
+
+    function getCachedDesign() {
+        try {
+            var cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                var parsed = JSON.parse(cached);
+                if (Date.now() - parsed.timestamp < CACHE_TTL) return parsed.data;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function cacheDesign(data) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ data: data, timestamp: Date.now() }));
+        } catch (e) {}
+    }
+
+    function loadGoogleFont(family) {
+        if (!family || family === 'Inter') return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + family.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
+        document.head.appendChild(link);
+    }
+
+    function applyDesignToElement(el, design) {
+        if (!el || !design) return;
+        if (design.backgroundColor) el.style.backgroundColor = design.backgroundColor;
+        if (design.textColor) el.style.color = design.textColor;
+        el.style.border = (design.borderWidth || 1) + 'px solid ' + (design.borderColor || '#000000');
+        if (design.borderRadius !== undefined) el.style.borderRadius = design.borderRadius + 'px';
+        if (design.fontFamily) el.style.fontFamily = design.fontFamily;
+        if (design.fontSize) el.style.fontSize = design.fontSize + 'px';
+        if (design.fontWeight) el.style.fontWeight = design.fontWeight;
+        if (design.textTransform) el.style.textTransform = design.textTransform;
+        if (design.letterSpacing !== undefined) el.style.letterSpacing = design.letterSpacing + 'px';
+        if (design.height) el.style.height = design.height + 'px';
+        if (design.shadow) {
+            el.style.boxShadow = '0 4px 12px rgba(0,0,0,' + (design.shadowIntensity || 0.15) + ')';
+        }
+        if (design.gradient) {
+            el.style.background = 'linear-gradient(' + design.gradient.direction + ', ' + design.gradient.colors[0] + ', ' + design.gradient.colors[1] + ')';
+        }
+        if (design.customCSS) {
+            el.style.cssText += ';' + design.customCSS;
+        }
+    }
+
+    function fetchDesignFromAPI() {
+        if (!STORE_ID || !API_HOST) return Promise.resolve(null);
+        var cached = getCachedDesign();
+        if (cached) return Promise.resolve(cached);
+        return fetch(API_HOST + '/api/design/' + STORE_ID)
+            .then(function(res) { return res.ok ? res.json() : null; })
+            .then(function(data) {
+                if (!data) return null;
+                cacheDesign(data);
+                if (data.photo_button && data.photo_button.fontFamily) loadGoogleFont(data.photo_button.fontFamily);
+                if (data.buy_button && data.buy_button.fontFamily) loadGoogleFont(data.buy_button.fontFamily);
+                return data;
+            })
+            .catch(function() { return null; });
+    }
+
+    // Fetch and apply design after DOM is ready
+    fetchDesignFromAPI().then(function(designData) {
+        if (!designData) return;
+        _fetchedDesign = designData;
+        if (designData.button_mode) {
+            BUTTON_MODE = designData.button_mode;
+        }
+
+        // Apply styles to BUY button
+        var buyBtn = document.querySelector('.pl-btn-provador-buy');
+        if (buyBtn && designData.buy_button) {
+            applyDesignToElement(buyBtn, designData.buy_button);
+            var textNode = buyBtn.lastChild;
+            if (textNode && textNode.nodeType === 3 && designData.buy_button.label) {
+                textNode.textContent = designData.buy_button.label;
+            }
+            var badge = document.querySelector('.pl-badge-novidade');
+            if (badge && designData.buy_button.badgeText) {
+                badge.textContent = designData.buy_button.badgeText;
+            }
+            if (badge && designData.buy_button.badge === false) {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Apply styles to PHOTO button
+        var photoBtn = document.querySelector('.mc-btn-trigger-ia');
+        if (photoBtn && designData.photo_button) {
+            applyDesignToElement(photoBtn, designData.photo_button);
+        }
+
+        // Hide/show buttons based on button_mode
+        if (BUTTON_MODE === 'image') {
+            var buyContainer = document.querySelector('.pl-buy-btn-container');
+            if (buyContainer) buyContainer.style.display = 'none';
+        } else if (BUTTON_MODE === 'buy') {
+            var photoEl = document.querySelector('.mc-btn-trigger-ia');
+            if (photoEl) photoEl.style.display = 'none';
+        }
+    });
 
     // ─── TABELAS DE TAMANHOS ──────────────────────────────────────────────────────
 
@@ -186,6 +303,65 @@
             transform: scale(1.1) !important;
         }
         .mc-btn-trigger-ia img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* ── Botão inline (acima do comprar) ── */
+        .pl-buy-btn-container {
+            width: 100%;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .pl-btn-provador-buy {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+            height: 45px !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #000000 !important;
+            border-radius: 0px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 2px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+        }
+        .pl-btn-provador-buy:hover {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+        .pl-btn-provador-buy svg { fill: currentColor; }
+        .pl-badge-novidade {
+            position: absolute;
+            top: -28px;
+            right: -85px;
+            background: #000;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-family: 'Inter', sans-serif;
+            animation: mc-float-badge 3s ease-in-out infinite;
+        }
+        @keyframes mc-float-badge {
+            0%, 100% { transform: translateY(0) rotate(2deg); }
+            50% { transform: translateY(-5px) rotate(-1deg); }
+        }
+        @media (max-width: 767px) {
+            .pl-buy-btn-container { overflow: visible !important; }
+            .pl-badge-novidade { right: -55px !important; }
+            .pl-svg-linha { right: -45px !important; width: 60px !important; }
+        }
         #mc-modal-ia {
             display: none; position: fixed; inset: 0;
             background: rgba(255,255,255,0.98);
@@ -482,67 +658,164 @@
         document.body.appendChild(modalContainer);
         LOG.ok('Modal HTML injetado no DOM');
 
-        // ── Botão trigger ──
+        // ── Botão trigger (selo na foto) ──
         const openBtn = document.createElement('button');
         openBtn.className = 'mc-btn-trigger-ia';
         openBtn.id = 'mc-open-ia';
         openBtn.setAttribute('aria-label', 'Abrir Provador Virtual');
         openBtn.innerHTML = stampImageHTML;
 
-        const trayImgContainers = [
+        // ── Botão inline (acima do comprar) ──
+        // Note: The buy button HTML is hardcoded static content (no user input), so innerHTML is safe here.
+        function createBuyButton() {
+            var container = document.createElement('div');
+            container.className = 'pl-buy-btn-container';
+            container.style.cssText = 'position:relative;width:100%;max-width:200px;margin:35px auto 15px;';
+
+            var badge = document.createElement('div');
+            badge.className = 'pl-badge-novidade';
+            badge.textContent = 'Novidade!';
+            container.appendChild(badge);
+
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'pl-svg-linha');
+            svg.setAttribute('width', '80');
+            svg.setAttribute('height', '40');
+            svg.style.cssText = 'position:absolute;top:-20px;right:-65px;pointer-events:none;z-index:1;';
+            var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M75,10 Q50,35 5,32');
+            path.setAttribute('stroke', 'black');
+            path.setAttribute('stroke-width', '1.2');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke-dasharray', '3,3');
+            svg.appendChild(path);
+            container.appendChild(svg);
+
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'pl-btn-provador-buy';
+            btn.style.cssText = 'width:100%!important;margin:0!important;';
+
+            var icon = document.createElement('img');
+            icon.src = 'https://i.ibb.co/50TPgYj/cabine-icone-oficial.png';
+            icon.alt = 'Provador';
+            icon.style.cssText = 'width:20px;height:20px;margin-right:8px;object-fit:contain;';
+            btn.appendChild(icon);
+            btn.appendChild(document.createTextNode('Provador Virtual'));
+
+            btn.addEventListener('click', function () {
+                document.getElementById('mc-open-ia')?.click();
+            });
+
+            container.appendChild(btn);
+            return container;
+        }
+
+        function placeBuyButton() {
+            var trayBuySelectors = [
+                '.buy-button',
+                '#buy-button',
+                '.botao-comprar',
+                '#botao-comprar',
+                '.product-buy',
+                '.btn-buy',
+                'button[name="buy"]',
+                'input[name="buy"]',
+                '.product-colum-right .box-buy',
+                '.box-buy',
+                '.product-action',
+                '.product-actions',
+                '.add-to-cart',
+                '#addToCart',
+            ];
+
+            for (var i = 0; i < trayBuySelectors.length; i++) {
+                var buyEl = document.querySelector(trayBuySelectors[i]);
+                if (buyEl) {
+                    var buyBtnContainer = createBuyButton();
+                    buyEl.parentNode.insertBefore(buyBtnContainer, buyEl);
+                    LOG.ok('Botao inline posicionado acima de: "' + trayBuySelectors[i] + '"');
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        var trayImgContainers = [
             '.image-show',
             '.box-gallery',
             '.product-colum-left',
         ];
-        const fallbackContainers = [
+        var fallbackContainers = [
             '.product__media-wrapper', '.product-gallery__media', '.product__media',
             '.product-image-main', '.product-media-container', '[data-media-id]',
             '.product__media-item', '.product-gallery', '.product-single__media', '.media-gallery'
         ];
 
-        let placed = false;
-        for (const sel of [...trayImgContainers, ...fallbackContainers]) {
-            const el = document.querySelector(sel);
-            if (el) {
-                const isMobile = window.innerWidth < 768;
-                const btnSize = isMobile ? '80px' : '60px';
+        // ── Posicionar selo na foto (mode: 'image' ou 'both') ──
+        var placedImage = false;
+        if (BUTTON_MODE === 'image' || BUTTON_MODE === 'both') {
+            for (var si = 0; si < trayImgContainers.concat(fallbackContainers).length; si++) {
+                var sel = trayImgContainers.concat(fallbackContainers)[si];
+                var el = document.querySelector(sel);
+                if (el) {
+                    var isMobile = window.innerWidth < 768;
+                    var btnSize = isMobile ? '80px' : '60px';
 
-                // Ambos usam position:fixed para evitar overflow:hidden dos containers
-                document.body.appendChild(openBtn);
-                // Mobile z-index igual ao desktop — evitamos overlap por threshold de posição
-                // Estilos básicos e dinâmicos via JS, o resto via classe CSS (inclusive animação)
-                openBtn.style.position = 'fixed';
-                openBtn.style.zIndex = '50';
-                openBtn.style.width = btnSize;
-                openBtn.style.height = btnSize;
+                    document.body.appendChild(openBtn);
+                    openBtn.style.position = 'fixed';
+                    openBtn.style.zIndex = '50';
+                    openBtn.style.width = btnSize;
+                    openBtn.style.height = btnSize;
 
-                function positionBtn() {
-                    const rect = el.getBoundingClientRect();
-                    const btnTop = rect.top + (isMobile ? 70 : 15);
-                    // Mobile: esconde quando o botão entraria na área do header fixo (~80px)
-                    // Desktop: esconde quando entraria no menu fixo (~120px)
-                    const threshold = isMobile ? 80 : 120;
-                    if (btnTop < threshold || rect.bottom < 0) {
-                        openBtn.style.visibility = 'hidden';
-                    } else {
-                        openBtn.style.visibility = 'visible';
-                        openBtn.style.top = btnTop + 'px';
-                        openBtn.style.left = (rect.right - (isMobile ? 100 : 180)) + 'px';
-                    }
+                    (function(targetEl, mobile) {
+                        function positionBtn() {
+                            var rect = targetEl.getBoundingClientRect();
+                            var btnTop = rect.top + (mobile ? 70 : 15);
+                            var threshold = mobile ? 80 : 120;
+                            if (btnTop < threshold || rect.bottom < 0) {
+                                openBtn.style.visibility = 'hidden';
+                            } else {
+                                openBtn.style.visibility = 'visible';
+                                openBtn.style.top = btnTop + 'px';
+                                openBtn.style.left = (rect.right - (mobile ? 100 : 180)) + 'px';
+                            }
+                        }
+                        positionBtn();
+                        window.addEventListener('scroll', positionBtn);
+                        window.addEventListener('resize', positionBtn);
+                    })(el, isMobile);
+
+                    placedImage = true;
+                    LOG.ok('Selo posicionado (' + (isMobile ? 'mobile' : 'desktop') + ') sobre: "' + sel + '"');
+                    break;
                 }
-                positionBtn();
-                window.addEventListener('scroll', positionBtn);
-                window.addEventListener('resize', positionBtn);
-
-                placed = true;
-                LOG.ok('Botão posicionado (' + (isMobile ? 'mobile' : 'desktop') + ') sobre: "' + sel + '" (position:fixed)');
-                break;
+            }
+            if (!placedImage) {
+                document.body.appendChild(openBtn);
+                openBtn.style.cssText = 'position:fixed;bottom:100px;left:20px;z-index:50;width:60px;height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;padding:0;';
+                placedImage = true;
             }
         }
-        if (!placed) {
+
+        // ── Posicionar botão acima do comprar (mode: 'buy' ou 'both') ──
+        if (BUTTON_MODE === 'buy' || BUTTON_MODE === 'both') {
+            var buyPlaced = placeBuyButton();
+
+            if (BUTTON_MODE === 'buy') {
+                openBtn.style.display = 'none';
+                document.body.appendChild(openBtn);
+            }
+
+            if (!buyPlaced) {
+                LOG.warn('Nenhum botao de compra encontrado para posicionar botao inline');
+            }
+        }
+
+        // Fallback: se nenhum modo colocou o openBtn no DOM
+        if (!placedImage && BUTTON_MODE !== 'buy') {
             document.body.appendChild(openBtn);
             openBtn.style.cssText = 'position:fixed;bottom:100px;left:20px;z-index:50;width:60px;height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;padding:0;';
-            LOG.warn('Nenhum container encontrado — botão fixado no canto (fallback)');
         }
 
         const modal = document.getElementById('mc-modal-ia');
