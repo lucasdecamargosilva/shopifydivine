@@ -180,7 +180,7 @@
                 // Re-assert position so store CSS cannot override it
                 photoBtn.style.setProperty('position', 'absolute', 'important');
                 photoBtn.style.setProperty('top', '15px', 'important');
-                photoBtn.style.setProperty('left', '15px', 'important');
+                photoBtn.style.setProperty('right', '15px', 'important');
                 photoBtn.style.setProperty('z-index', '10', 'important');
                 // Apply animation
                 var anim = designData.photo_button.hoverAnimation || 'none';
@@ -193,7 +193,7 @@
                 // Re-assert position after applyDesignToElement (customCSS could overwrite)
                 photoBtn.style.setProperty('position', 'absolute', 'important');
                 photoBtn.style.setProperty('top', '15px', 'important');
-                photoBtn.style.setProperty('left', '15px', 'important');
+                photoBtn.style.setProperty('right', '15px', 'important');
                 photoBtn.style.setProperty('z-index', '10', 'important');
                 // Apply icon color to photo button icon
                 if (designData.photo_button.iconColor) {
@@ -384,7 +384,7 @@
         .mc-btn-trigger-ia {
             position: absolute;
             top: 15px;
-            left: 15px;
+            right: 15px;
             z-index: 10;
             background: none;
             border: none;
@@ -891,7 +891,7 @@
                     el.appendChild(openBtn);
                     openBtn.style.setProperty('position', 'absolute', 'important');
                     openBtn.style.setProperty('top', '15px', 'important');
-                    openBtn.style.setProperty('left', '15px', 'important');
+                    openBtn.style.setProperty('right', '15px', 'important');
                     openBtn.style.setProperty('z-index', '10', 'important');
                     openBtn.style.setProperty('width', '60px', 'important');
                     openBtn.style.setProperty('height', '60px', 'important');
@@ -903,7 +903,7 @@
             }
             if (!placedImage) {
                 document.body.appendChild(openBtn);
-                openBtn.style.cssText = 'position:fixed;bottom:100px;left:20px;z-index:50;width:60px;height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;padding:0;';
+                openBtn.style.cssText = 'position:fixed;bottom:100px;right:20px;z-index:50;width:60px;height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;padding:0;';
                 placedImage = true;
             }
         }
@@ -937,7 +937,7 @@
         // Fallback: se nenhum modo colocou o openBtn no DOM
         if (!placedImage && BUTTON_MODE !== 'buy') {
             document.body.appendChild(openBtn);
-            openBtn.style.cssText = 'position:fixed;bottom:100px;left:20px;z-index:50;width:60px;height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;padding:0;';
+            openBtn.style.cssText = 'position:fixed;bottom:100px;right:20px;z-index:50;width:60px;height:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;padding:0;';
         }
 
         const modal = document.getElementById('mc-modal-ia');
