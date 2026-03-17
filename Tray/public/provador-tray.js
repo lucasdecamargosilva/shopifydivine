@@ -181,7 +181,7 @@
                 photoBtn.style.setProperty('position', 'absolute', 'important');
                 photoBtn.style.setProperty('top', '15px', 'important');
                 photoBtn.style.setProperty('right', '15px', 'important');
-                photoBtn.style.setProperty('z-index', '10', 'important');
+                photoBtn.style.setProperty('z-index', '9999', 'important');
                 // Apply animation
                 var anim = designData.photo_button.hoverAnimation || 'none';
                 if (anim === 'shake') photoBtn.style.animation = 'mc-shake 3s infinite';
@@ -194,7 +194,7 @@
                 photoBtn.style.setProperty('position', 'absolute', 'important');
                 photoBtn.style.setProperty('top', '15px', 'important');
                 photoBtn.style.setProperty('right', '15px', 'important');
-                photoBtn.style.setProperty('z-index', '10', 'important');
+                photoBtn.style.setProperty('z-index', '9999', 'important');
                 // Apply icon color to photo button icon
                 if (designData.photo_button.iconColor) {
                     var photoIcon = photoBtn.querySelector('img');
@@ -210,6 +210,21 @@
         } else if (BUTTON_MODE === 'buy') {
             var photoEl = document.querySelector('.mc-btn-trigger-ia');
             if (photoEl) photoEl.style.display = 'none';
+        }
+
+        // Apply custom logo inside the provador modal
+        if (designData.custom_logo) {
+            var headerDiv = document.getElementById('mc-header-provador');
+            if (headerDiv) {
+                var logoContainer = headerDiv.querySelector('div');
+                if (logoContainer) {
+                    var logoImg = logoContainer.querySelector('img');
+                    if (logoImg) {
+                        logoImg.src = designData.custom_logo;
+                        logoImg.alt = 'Logo da loja';
+                    }
+                }
+            }
         }
 
     }
@@ -385,7 +400,7 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            z-index: 10;
+            z-index: 9999;
             background: none;
             border: none;
             padding: 0;
@@ -393,6 +408,7 @@
             width: 60px;
             height: 60px;
             display: flex;
+            pointer-events: auto !important;
             align-items: center;
             justify-content: center;
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
@@ -892,7 +908,7 @@
                     openBtn.style.setProperty('position', 'absolute', 'important');
                     openBtn.style.setProperty('top', '15px', 'important');
                     openBtn.style.setProperty('right', '15px', 'important');
-                    openBtn.style.setProperty('z-index', '10', 'important');
+                    openBtn.style.setProperty('z-index', '9999', 'important');
                     openBtn.style.setProperty('width', '60px', 'important');
                     openBtn.style.setProperty('height', '60px', 'important');
 
@@ -976,8 +992,9 @@
         }
 
 
-        openBtn.onclick = () => {
-
+        openBtn.onclick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
             const prodName = document.querySelector('h1.product-name, h1.product__title, .product-single__title, h1')?.innerText || document.title;
             LOG.info('Botão clicado — produto: "' + prodName + '"');
             applyProduct(detectProduct(prodName));

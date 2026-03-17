@@ -135,7 +135,7 @@ function setupDesignRoutes(app) {
     try {
       const { store_id } = req.params;
       const resp = await supabase(
-        `store_designs?store_id=eq.${encodeURIComponent(store_id)}&select=photo_button,buy_button,button_mode,version,custom_image`,
+        `store_designs?store_id=eq.${encodeURIComponent(store_id)}&select=photo_button,buy_button,button_mode,version,custom_image,custom_logo`,
         { headers: { 'Accept': 'application/json' } }
       );
       if (!resp.ok) {
@@ -158,7 +158,8 @@ function setupDesignRoutes(app) {
         photo_button: photoBtn,
         buy_button: { ...DEFAULTS, ...row.buy_button },
         button_mode: row.button_mode,
-        version: row.version
+        version: row.version,
+        custom_logo: row.custom_logo || null
       });
     } catch (err) {
       console.error('GET /api/design error:', err);
@@ -317,6 +318,82 @@ function setupDesignRoutes(app) {
       return res.json({ success: true });
     } catch (err) {
       console.error('DELETE /api/design/image error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // PUT custom logo (authenticated)
+  app.put('/api/design/:store_id/logo', async (req, res) => {
+    try {
+      const { store_id } = req.params;
+      const authenticated = await authenticate(req, store_id);
+      if (!authenticated) return res.status(401).json({ error: 'Unauthorized' });
+
+      const { image } = req.body;
+      if (!image || typeof image !== 'string') {
+        return res.status(422).json({ error: 'Missing image data' });
+      }
+      if (!image.startsWith('data:image/')) {
+        return res.status(422).json({ error: 'Logo must be a data:image URI' });
+      }
+      if (image.length > 500000) {
+        return res.status(422).json({ error: 'Logo too large (max 500KB)' });
+      }
+
+      let resp = await supabase(
+        `store_designs?store_id=eq.${encodeURIComponent(store_id)}`,
+        {
+          method: 'PATCH',
+          prefer: 'return=representation',
+          body: JSON.stringify({ custom_logo: image }),
+          headers: { 'Accept': 'application/json' }
+        }
+      );
+
+      if (resp.ok) {
+        const rows = await resp.json();
+        if (rows.length === 0) {
+          resp = await supabase('store_designs', {
+            method: 'POST',
+            prefer: 'return=representation',
+            body: JSON.stringify({ store_id, custom_logo: image }),
+            headers: { 'Accept': 'application/json' }
+          });
+          if (!resp.ok) {
+            console.error('Supabase logo POST error:', await resp.text());
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+        }
+        return res.json({ success: true });
+      }
+
+      console.error('Supabase logo PATCH error:', await resp.text());
+      return res.status(500).json({ error: 'Internal server error' });
+    } catch (err) {
+      console.error('PUT /api/design/logo error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // DELETE custom logo (authenticated)
+  app.delete('/api/design/:store_id/logo', async (req, res) => {
+    try {
+      const { store_id } = req.params;
+      const authenticated = await authenticate(req, store_id);
+      if (!authenticated) return res.status(401).json({ error: 'Unauthorized' });
+
+      await supabase(
+        `store_designs?store_id=eq.${encodeURIComponent(store_id)}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ custom_logo: null }),
+          headers: { 'Accept': 'application/json' }
+        }
+      );
+
+      return res.json({ success: true });
+    } catch (err) {
+      console.error('DELETE /api/design/logo error:', err);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

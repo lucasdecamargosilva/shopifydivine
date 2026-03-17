@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ColorControl from './controls/ColorControl';
 import TextControl from './controls/TextControl';
 import ShapeControl from './controls/ShapeControl';
@@ -81,12 +81,40 @@ const SECTIONS = [
   { id: 'advanced', label: 'Avancado', icon: '\u{2699}\u{FE0F}', Component: AdvancedControl },
 ];
 
-export default function EditorPanel({ design, activeButton, onChangeButton, onChange }) {
+function resizeImage(file, maxSize, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/png'));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+export default function EditorPanel({ design, activeButton, onChangeButton, onChange, onChangeLogo }) {
   const [openSection, setOpenSection] = useState('colors');
+  const logoFileRef = useRef(null);
   const buttonDesign = design[activeButton];
 
   function handleChange(field, value) {
     onChange(activeButton, { ...buttonDesign, [field]: value });
+  }
+
+  function handleLogoUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    resizeImage(file, 300, (dataUrl) => onChangeLogo(dataUrl));
   }
 
   return (
@@ -118,6 +146,51 @@ export default function EditorPanel({ design, activeButton, onChangeButton, onCh
             <MiniPhotoButton design={buttonDesign} />
           )}
         </div>
+      </div>
+
+      {/* Logo do Provador */}
+      <div className="border-b border-gray-200">
+        <button
+          onClick={() => setOpenSection(openSection === 'logo' ? null : 'logo')}
+          className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-brand-dark hover:bg-white transition"
+        >
+          <span>{'\u{1F3F7}\u{FE0F}'}</span>
+          <span>Logo do Provador</span>
+          <span className="ml-auto text-brand-gray">{openSection === 'logo' ? '\u2212' : '+'}</span>
+        </button>
+        {openSection === 'logo' && (
+          <div className="px-4 pb-4 space-y-2">
+            <p className="text-[10px] text-brand-gray">Logo exibido dentro do provador virtual, abaixo do titulo. Substitui o logo padrao da Provou Levou.</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => logoFileRef.current?.click()}
+                className="px-3 py-1.5 text-xs font-semibold bg-brand-purple text-white rounded-md hover:opacity-90 transition"
+              >
+                Escolher logo
+              </button>
+              {design.custom_logo && (
+                <button
+                  onClick={() => onChangeLogo(null)}
+                  className="px-3 py-1.5 text-xs font-semibold bg-red-500 text-white rounded-md hover:opacity-90 transition"
+                >
+                  Remover
+                </button>
+              )}
+            </div>
+            <input ref={logoFileRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+            {design.custom_logo && (
+              <div className="mt-2 flex justify-center bg-gray-50 rounded-lg p-3">
+                <img src={design.custom_logo} alt="Logo" className="max-h-[40px] object-contain" />
+              </div>
+            )}
+            {!design.custom_logo && (
+              <div className="mt-2 flex justify-center bg-gray-50 rounded-lg p-3">
+                <img src="https://provoulevou.com.br/assets/provoulevou-logo.png" alt="Logo padrao" className="max-h-[40px] object-contain opacity-50" />
+                <span className="text-[9px] text-brand-gray ml-2 self-center">(padrao)</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Accordion sections */}

@@ -77,6 +77,39 @@ export async function deleteButtonImage(storeId, token) {
   if (!res.ok && res.status !== 404) throw new Error(`Failed to delete image: ${res.status}`);
 }
 
+export async function uploadLogo(storeId, token, base64Data) {
+  if (!base64Data) return null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const res = await fetch(`${API_BASE}/api/design/${storeId}/logo`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify({ image: base64Data }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (res.status === 401) throw new Error('unauthorized');
+    if (!res.ok) throw new Error(`Failed to upload logo: ${res.status}`);
+    return res.json();
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') throw new Error('Timeout: upload do logo falhou');
+    throw err;
+  }
+}
+
+export async function deleteLogo(storeId, token) {
+  const res = await fetch(`${API_BASE}/api/design/${storeId}/logo`, {
+    method: 'DELETE',
+    headers: { 'Authorization': token }
+  });
+  if (!res.ok && res.status !== 404) throw new Error(`Failed to delete logo: ${res.status}`);
+}
+
 export async function fetchDefaults(storeId) {
   const res = await fetch(`${API_BASE}/api/design/${storeId}/defaults`);
   return res.json();

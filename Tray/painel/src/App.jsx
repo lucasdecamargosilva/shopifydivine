@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import EditorPanel from './components/EditorPanel';
 import PreviewPanel from './components/PreviewPanel';
-import { fetchDesign, saveDesign, uploadButtonImage, deleteButtonImage, fetchDefaults } from './api';
+import { fetchDesign, saveDesign, uploadButtonImage, deleteButtonImage, uploadLogo, deleteLogo, fetchDefaults } from './api';
 import { DEFAULTS } from './defaults';
 
 function getParams() {
@@ -20,7 +20,8 @@ export default function App() {
   const [design, setDesign] = useState({
     photo_button: { ...DEFAULTS },
     buy_button: { ...DEFAULTS },
-    button_mode: 'both'
+    button_mode: 'both',
+    custom_logo: null
   });
   const [savedDesign, setSavedDesign] = useState(null);
   const [activeButton, setActiveButton] = useState('photo_button');
@@ -60,7 +61,8 @@ export default function App() {
         const merged = {
           photo_button: { ...DEFAULTS, ...data.photo_button },
           buy_button: { ...DEFAULTS, ...data.buy_button },
-          button_mode: data.button_mode || 'both'
+          button_mode: data.button_mode || 'both',
+          custom_logo: data.custom_logo || null
         };
         setDesign(merged);
         setSavedDesign(merged);
@@ -89,6 +91,10 @@ export default function App() {
     setDesign(prev => ({ ...prev, button_mode: mode }));
   }, []);
 
+  const handleChangeLogo = useCallback((logo) => {
+    setDesign(prev => ({ ...prev, custom_logo: logo }));
+  }, []);
+
   async function handleSave() {
     if (isDemo) {
       setToast({ type: 'success', message: 'Modo demo: preview atualizado! Para salvar de verdade, acesse pelo admin da loja.' });
@@ -111,7 +117,15 @@ export default function App() {
         await deleteButtonImage(storeId, token).catch(() => {});
       }
 
-      // 2) Save design (without base64 — stripped in api.js)
+      // 2) Upload custom logo separately (if present)
+      const logoImg = design.custom_logo;
+      if (logoImg && logoImg.startsWith('data:image/')) {
+        await uploadLogo(storeId, token, logoImg);
+      } else if (!logoImg) {
+        await deleteLogo(storeId, token).catch(() => {});
+      }
+
+      // 3) Save design (without base64 — stripped in api.js)
       await saveDesign(storeId, token, design);
       setSavedDesign({ ...design });
       setToast({ type: 'success', message: 'Design salvo! As mudancas ja estao ativas na sua loja.' });
@@ -171,6 +185,7 @@ export default function App() {
           onChangeButton={setActiveButton}
           onChangeMode={handleChangeMode}
           onChange={handleChange}
+          onChangeLogo={handleChangeLogo}
         />
         <PreviewPanel design={design} activeButton={activeButton} onChangeMode={handleChangeMode} />
       </div>

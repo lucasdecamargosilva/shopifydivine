@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 // JSON body parsing — small limit for design saves, larger for image uploads
 app.use('/api/design/:store_id/image', express.json({ limit: '1mb' }));
+app.use('/api/design/:store_id/logo', express.json({ limit: '1mb' }));
 app.use(express.json({ limit: '100kb' }));
 
 // CORS - allowlist for credentialed requests
