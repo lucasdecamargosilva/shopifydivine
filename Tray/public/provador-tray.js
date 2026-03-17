@@ -163,15 +163,21 @@
                 photoBtn.style.setProperty('border', 'none', 'important');
                 photoBtn.style.setProperty('padding', '0', 'important');
                 photoBtn.style.setProperty('cursor', 'pointer');
+                // Re-assert positioning (may have been lost if design applied before init)
+                photoBtn.style.setProperty('position', 'fixed', 'important');
+                photoBtn.style.setProperty('display', 'flex', 'important');
+                photoBtn.style.setProperty('align-items', 'center', 'important');
+                photoBtn.style.setProperty('justify-content', 'center', 'important');
                 var customImg = document.createElement('img');
                 customImg.src = designData.photo_button.customButtonImage;
                 customImg.alt = 'Provador Virtual';
-                customImg.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+                customImg.style.cssText = 'width:100%;height:100%;object-fit:contain;pointer-events:none;';
                 photoBtn.appendChild(customImg);
                 var sz = (designData.photo_button.height || 60) + 'px';
                 photoBtn.style.setProperty('width', sz, 'important');
                 photoBtn.style.setProperty('height', sz, 'important');
                 photoBtn.style.setProperty('filter', 'none', 'important');
+                photoBtn.style.setProperty('box-shadow', 'none', 'important');
                 // Apply animation
                 var anim = designData.photo_button.hoverAnimation || 'none';
                 if (anim === 'shake') photoBtn.style.animation = 'mc-shake 3s infinite';
@@ -196,6 +202,9 @@
             var photoEl = document.querySelector('.mc-btn-trigger-ia');
             if (photoEl) photoEl.style.display = 'none';
         }
+
+        // Re-trigger position handler after style changes
+        window.dispatchEvent(new Event('scroll'));
     }
 
     function fetchDesignFromAPI() {
