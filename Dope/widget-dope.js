@@ -502,6 +502,7 @@
                     fd.append('whatsapp', '55' + phoneVal);
                     fd.append('phone_raw', phoneInput.value);
                     fd.append('product_name', prodName);
+                    fd.append('product_url', window.location.href);
                     fd.append('origin', window.location.origin);
 
                     return fetch(WEBHOOK_PROVA, { method: 'POST', body: fd });

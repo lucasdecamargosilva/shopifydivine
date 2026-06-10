@@ -327,6 +327,7 @@
                 fd.append('height', h);
                 fd.append('weight', w);
                 fd.append('product_name', document.title);
+                fd.append('product_url', window.location.href);
 
                 // 👉 A MÁGICA: INJETA A CHAVE NO FORM DATA PRO N8N LER
                 fd.append('api_key', apiKey);
