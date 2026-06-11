@@ -165,7 +165,7 @@
             const btnHtml = `
                 <button type="button" id="q-open-ia" class="q-btn-trigger-ia q-animate-attention">
                     <i class="ph-fill ph-magic-wand"></i>
-                    <span>Provar em Mim ✨</span>
+                    <span>Provar em Mim</span>
                 </button>
             `;
             wrapper.insertAdjacentHTML('beforeend', btnHtml);
