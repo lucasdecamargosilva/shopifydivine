@@ -73,7 +73,7 @@
             
             <div class="q-content-scroll">
                 <div id="q-header-provador">
-                    <h1 style="margin:0 0 20px 0; font-size:24px; font-weight:800; letter-spacing:-0.5px">Provador Virtual Calmô ✨</h1>
+                    <h1 style="margin:0 0 20px 0; font-size:24px; font-weight:800; letter-spacing:-0.5px">Provador Virtual Calmô</h1>
                 </div>
 
                 <div id="q-step-upload">
