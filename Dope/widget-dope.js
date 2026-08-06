@@ -3,6 +3,7 @@
     const API_KEY = 'pl_live_27c4eb2dd170722236b299720634953653d9f6cd24bd261fc0233245501980f3';
 
     const styles = `
+/* PL: borda arredondada do modal */@media(min-width:768px){.q-card-ia,.q-card,#q-card-ia,#q-card,.q-modal-card{border-radius:16px !important;overflow:hidden;}}
         :root {
             --q-primary: #000000;
             --q-bg: #ffffff;
